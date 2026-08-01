@@ -4,10 +4,45 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Siao</title>
-<meta name="description" content="The summit is a lie. The boulder is real.">
+
+<!-- One description, reused everywhere below: a search snippet, a share-card
+     preview, and (as og:*) what Slack/LINE/iMessage/Discord render when this
+     link gets pasted somewhere — that part is read by people, not crawlers.
+     No age, no legal name — see ClaudeDocs/NOTES_HOMEPAGE.md ch.20 for why. -->
+<meta name="description" content="Siao — student, self-taught developer, working in Python and AI. The summit is a lie. The boulder is real.">
+<link rel="canonical" href="https://siao.ai/">
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://siao.ai/">
+<meta property="og:site_name" content="Siao">
+<meta property="og:title" content="Siao">
+<meta property="og:description" content="Siao — student, self-taught developer, working in Python and AI. The summit is a lie. The boulder is real.">
+<!-- No og:image yet — deferred alongside the email-obfuscation fix. Add it
+     and switch twitter:card to summary_large_image when it exists. -->
+
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Siao">
+<meta name="twitter:description" content="Siao — student, self-taught developer, working in Python and AI. The summit is a lie. The boulder is real.">
+
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preload" href="/fonts/eb-garamond-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/styles.css">
+
+<!-- The only tag on this page meant for a machine, not a person: a formal
+     claim that the word "Siao" names this entity. sameAs is deliberately
+     omitted, not emptied — schema.org validators expect it populated or
+     absent, not an empty array. Add it as a real array of profile URLs
+     once there's somewhere to point it. -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Siao",
+  "url": "https://siao.ai/",
+  "description": "Student, self-taught developer, working in Python and AI.",
+  "knowsAbout": ["Python", "Artificial Intelligence"]
+}
+</script>
 </head>
 <body>
 
