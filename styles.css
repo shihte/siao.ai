@@ -3,7 +3,7 @@
   src: url("/fonts/eb-garamond-latin.woff2") format("woff2");
   font-weight: 400 500;
   font-style: normal;
-  font-display: block; /* block, not swap: a flash of the wrong serif is worse than a moment of nothing */
+  font-display: block;
 }
 
 :root {
@@ -12,22 +12,14 @@
   --ink-dim: #6E6B65;
   --name-fs: clamp(4.5rem, 32vw, 22rem);
 
-  /* ---- The geometry ----
-   *
-   * Viewport 1 (0vh - 100vh): Siao strike zone & rebirth
-   * Viewport 2 (100vh - 200vh): Exits (hello@siao.ai) at 150vh
-   *
-   * Siao starts at 50vh. When struck, wreck falls 100vh into Viewport 2 (150vh).
-   * Exits is static in Viewport 2 (150vh) — never moves, never tilts, never dragged down. */
   --gap: 0.58;
   --delta: 100vh;
 
-  /* ---- The choreography ---- */
   --fade-in: 0.5s;
   --hold: 5s;
-  --fall: 2s;      /* boulder: from above the page to below it */
+  --fall: 2s;
   --impact: 1.026s;
-  --drop: 1.5s;    /* how long the struck body takes to land */
+  --drop: 1.5s;
 
   color-scheme: only light;
 }
@@ -60,23 +52,51 @@ body {
   pointer-events: none;
 }
 
+/* Exits sits at top of Viewport 1 (above Siao).
+   Never moves, never tilts, never gets dragged down. */
+.exits {
+  position: absolute;
+  top: 15vh;
+  left: 0;
+  right: 0;
+  padding: 0 7vw;
+  transform: translateY(-50%);
+  z-index: 1;
+}
+
+.places { list-style: none; }
+
+.places li,
+.email {
+  font-size: clamp(1rem, 1.6vw, 1.25rem);
+  line-height: 2;
+}
+
+.places li:not(:has(a)) { color: var(--ink-dim); }
+
+.places:not(:empty) + .email { margin-top: 2.5rem; }
+
+a {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
+  padding-bottom: 0.08em;
+}
+
 /* Wreck starts at 50vh (Viewport 1 centre).
- * Z-index 1 keeps it behind the boulder (z-index 2). */
+   When struck, falls 100vh to 150vh (Viewport 2), landing in Viewport 2. */
 .wreck {
   position: absolute;
   top: 50vh;
   left: 0;
   right: 0;
-  z-index: 1;
+  z-index: 2;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .wreck { transform: translateY(100vh); }
 }
 
-/* .card holds only the name and statement.
- * transform-origin: 0 0 sets rotation pivot at top-left impact point,
- * guaranteeing zero upward (-v) flight. */
 .card {
   position: absolute;
   top: 0;
@@ -109,36 +129,6 @@ body {
   color: var(--ink-dim);
 }
 
-/* Exits is fixed in Viewport 2 at 150vh.
- * Never inside wreck, never receives transform/rotate, never gets dragged down. */
-.exits {
-  position: absolute;
-  top: 150vh;
-  left: 0;
-  right: 0;
-  padding: 0 7vw;
-  transform: translateY(-50%);
-}
-
-.places { list-style: none; }
-
-.places li,
-.email {
-  font-size: clamp(1rem, 1.6vw, 1.25rem);
-  line-height: 2;
-}
-
-.places li:not(:has(a)) { color: var(--ink-dim); }
-
-.places:not(:empty) + .email { margin-top: 2.5rem; }
-
-a {
-  color: inherit;
-  text-decoration: none;
-  border-bottom: 1px solid currentColor;
-  padding-bottom: 0.08em;
-}
-
 /* ---- The boulder ---- */
 
 .boulder {
@@ -148,7 +138,7 @@ a {
   width: calc(var(--name-fs) * 0.45);
   transform: translateX(33vw);
   visibility: hidden;
-  z-index: 2;
+  z-index: 3;
 }
 
 .boulder svg {
@@ -185,21 +175,17 @@ a {
   100%  { transform: translateY(260.0vh) rotate(310deg); }
 }
 
-/* ---- struck: wreck linear downward translation y(t) ----
- *
- * Siao falls 185vh (from 50vh to 235vh), passing completely through the bottom
- * of Viewport 2 into the abyss. Viewport 2 is left clean with only hello@siao.ai.
- * Siao is Launched DOWNWARDS ahead of boulder (Y_siao >= Y_boulder at all times).
- * Linear velocity dy/dt > 0 is strictly positive (downwards) at all times (+v). */
+/* Wreck drops 100vh to Viewport 2 (150vh).
+   Siao lands and lies in Viewport 2 where scrolling down (向上滑) finds it. */
 @keyframes struck {
   0%   { transform: translateY(0.00vh); }
-  10%  { transform: translateY(22.00vh); }
-  20%  { transform: translateY(48.00vh); }
-  30%  { transform: translateY(78.00vh); }
-  40%  { transform: translateY(112.00vh); }
-  50%  { transform: translateY(148.00vh); }
-  60%  { transform: translateY(185.00vh); }
-  100% { transform: translateY(185.00vh); }
+  10%  { transform: translateY(18.05vh); }
+  20%  { transform: translateY(36.20vh); }
+  30%  { transform: translateY(54.45vh); }
+  40%  { transform: translateY(72.80vh); }
+  50%  { transform: translateY(91.25vh); }
+  60%  { transform: translateY(100.00vh); }
+  100% { transform: translateY(100.00vh); }
 }
 
 @keyframes tumble {
