@@ -1,3 +1,8 @@
+/* A refresh is a fresh visit, not a return to wherever you'd scrolled to —
+ * the browser's own scroll restoration disagrees, so turn it off. Must run
+ * before anything else, synchronously, or the restore already happened. */
+history.scrollRestoration = "manual";
+
 /* The exits.
  *
  * Add a subdomain by adding one entry. Nothing else needs to change.
