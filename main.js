@@ -28,13 +28,12 @@ for (const place of PLACES) {
 /* ------------------------------------------------------------------ *
  * The act
  *
- * CSS owns the choreography; this file owns only two things — when the
- * act begins, and when to get out of the way.
+ * CSS owns the geometry and the choreography; this file owns only two
+ * things — when the act begins, and when to get out of the way.
  * ------------------------------------------------------------------ */
 
 const root = document.documentElement;
-const card = document.querySelector(".card");
-const exits = document.querySelector(".exits");
+const first = document.querySelector(".viewport-one");
 
 const ms = (name) => {
   const v = getComputedStyle(root).getPropertyValue(name).trim();
@@ -50,12 +49,22 @@ sessionStorage.setItem("seen", "1");
 
 let pending = null;
 let gliding = null;
+let handedOver = false;
 
 function yield_() {
+  handedOver = true;
   clearTimeout(pending);
   pending = null;
   if (gliding !== null) cancelAnimationFrame(gliding);
   gliding = null;
+}
+
+/* Because the exits are carried down by the blow rather than laid out where
+ * they end up, arriving early means arriving at nothing. So if the visitor
+ * has taken the wheel and gone looking, stop performing and put everything
+ * where it lands. An empty screen is a worse answer than a spoiled trick. */
+function settle() {
+  for (const a of document.getAnimations()) a.finish();
 }
 
 /* The blow sends everything downwards; the view goes with it. Easing out
@@ -63,7 +72,7 @@ function yield_() {
  * motion instead of two. */
 function glide() {
   const from = window.scrollY;
-  const to = exits.offsetTop;
+  const to = window.innerHeight;
   const span = 900;
   const start = performance.now();
 
@@ -78,6 +87,7 @@ function glide() {
 
 function play() {
   yield_();
+  handedOver = false;
   document.body.classList.remove("act");
   void document.body.offsetWidth; // reflow, so the animations restart
   document.body.classList.add("act");
@@ -95,26 +105,21 @@ addEventListener("pointerdown", yield_, { passive: true });
 addEventListener("keydown", (e) => { if (SCROLL_KEYS.has(e.key)) yield_(); });
 
 if (!stillness.matches) {
+  /* Only now do the exits move above the fold. Until this class exists they
+   * are laid out a viewport down, where someone without JS can still find
+   * them. */
   root.classList.add("motion");
 
-  /* The card coming into view is the only cue the act needs — it covers
+  /* Looking at the first viewport is the only cue the act needs — it covers
    * the first visit and every return alike. */
   new IntersectionObserver(
     ([entry]) => {
       if (entry.isIntersecting) play();
-      else clearTimeout(pending);
+      else {
+        clearTimeout(pending);
+        if (handedOver) settle();
+      }
     },
     { threshold: 0.95 }
-  ).observe(card);
-
-  /* Scene two lands as it is reached, top line first. */
-  const landing = [...list.children, document.querySelector(".email")];
-  landing.forEach((el, i) => el.style.setProperty("--i", i));
-
-  new IntersectionObserver(
-    ([entry]) => {
-      document.body.classList.toggle("landed", entry.isIntersecting);
-    },
-    { threshold: 0.4 }
-  ).observe(exits);
+  ).observe(first);
 }
