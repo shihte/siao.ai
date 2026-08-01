@@ -49,12 +49,13 @@ test.describe("who is steering", () => {
     expect(y).toBe(viewport);
   });
 
-  /* Anyone who takes the wheel early triggers settle(), which brings exits
-   * and Siao to their initial positions. Exits is in Viewport 1 (top of page). */
+  /* settle() finishes all animations instantly — the wreck drops 185vh,
+   * placing exits at 150vh (centre of Viewport 2). Scrolling to innerHeight
+   * brings the visitor to Viewport 2, where exits is right in front of them. */
   test("going looking early still finds the exits", async ({ page }) => {
     await page.goto("/");
     await page.mouse.wheel(0, 1); // the visitor takes the wheel
-    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.evaluate(() => window.scrollTo(0, window.innerHeight));
     await expect(page.locator(".email a")).toBeInViewport();
     await expect(page.locator(".email a")).toHaveText("hello@siao.ai");
   });
