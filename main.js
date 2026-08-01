@@ -139,9 +139,14 @@ if (!stillness.matches) {
     { threshold: 0.2 }
   ).observe(first);
 
-  /* Returning near top (scrollY <= 50) automatically resets and replays the act cleanly. */
+  let wasFallen = false;
+
+  /* Returning near top (scrollY <= 50) after scrolling down guarantees play() reset. */
   addEventListener("scroll", () => {
-    if (window.scrollY <= 50 && handedOver) {
+    if (window.scrollY > 100) {
+      wasFallen = true;
+    } else if (window.scrollY <= 50 && wasFallen) {
+      wasFallen = false;
       play();
     }
   }, { passive: true });
