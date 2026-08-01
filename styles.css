@@ -105,20 +105,15 @@ body {
   color: var(--ink-dim);
 }
 
-/* Without JS, or with motion turned off, nothing ever falls — so the exits
- * are laid out where a reader would scroll to find them, one viewport down. */
+/* Exits are in Viewport 1, always horizontal, level, and clean */
 .exits {
   position: absolute;
-  top: 100vh;
+  top: 50vh;
   left: 0;
   right: 0;
   padding: 0 7vw;
   transform: translateY(-50%);
 }
-
-/* With motion, exits wait above the fold inside .wreck, a fixed D from the name.
- * As the blow pushes .wreck down by 185vh, exits drops into Viewport 2 (150vh). */
-html.motion .exits { top: calc(-1 * var(--D)); }
 
 .places { list-style: none; }
 
@@ -143,11 +138,9 @@ a {
 
 .boulder {
   position: absolute;
-  /* Offset by half its own size so translate() addresses the boulder's centre,
-   * not its top-left corner — otherwise it "lands" a whole radius too low. */
   top: calc(var(--name-fs) * -0.225);
   left: calc(var(--name-fs) * -0.225);
-  width: calc(var(--name-fs) * 0.45); /* ~65% of the name's cap height */
+  width: calc(var(--name-fs) * 0.45);
   transform: translateX(33vw);
   visibility: hidden;
 }
@@ -164,15 +157,7 @@ a {
   .boulder { display: none; }
 }
 
-/* ---- The fall ----
- *
- * Position under constant acceleration goes as t², so the vertical keyframes
- * are a parabola sampled every 10% and played back linearly. Easing curves
- * only approximate this; the samples are exact.
- *
- * The boulder travels -25vh → 260vh, far enough to leave the page entirely
- * rather than parking itself in the second viewport. It meets the name's
- * centre at 50vh — see --impact for the arithmetic. */
+/* ---- The fall ---- */
 
 @keyframes boulder-x {
   from { transform: translateX(33vw); }
@@ -193,19 +178,19 @@ a {
   100% { transform: translateY(260.0vh) rotate(310deg); }
 }
 
-/* Impact: rotational tilt & downward acceleration on the struck body */
+/* Impact: boulder strikes Siao & statement, pushing them down into Viewport 2 */
 @keyframes struck {
   0%   { transform: translateY(0) rotate(0deg); }
-  10%  { transform: translateY(1.9vh) rotate(3deg); }
-  20%  { transform: translateY(7.4vh) rotate(7deg); }
-  30%  { transform: translateY(16.7vh) rotate(12deg); }
-  40%  { transform: translateY(29.6vh) rotate(18deg); }
-  50%  { transform: translateY(46.3vh) rotate(24deg); }
-  60%  { transform: translateY(66.6vh) rotate(29deg); }
-  70%  { transform: translateY(90.7vh) rotate(33deg); }
-  80%  { transform: translateY(118.4vh) rotate(36deg); }
-  90%  { transform: translateY(149.9vh) rotate(38deg); }
-  100% { transform: translateY(185vh) rotate(40deg); }
+  10%  { transform: translateY(1.9vh) rotate(2deg); }
+  20%  { transform: translateY(7.4vh) rotate(5deg); }
+  30%  { transform: translateY(16.7vh) rotate(8deg); }
+  40%  { transform: translateY(29.6vh) rotate(11deg); }
+  50%  { transform: translateY(46.3vh) rotate(14deg); }
+  60%  { transform: translateY(66.6vh) rotate(16deg); }
+  70%  { transform: translateY(90.7vh) rotate(17deg); }
+  80%  { transform: translateY(100vh) rotate(18deg); }
+  90%  { transform: translateY(100vh) rotate(18deg); }
+  100% { transform: translateY(100vh) rotate(18deg); }
 }
 
 @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
