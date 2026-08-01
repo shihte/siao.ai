@@ -57,15 +57,14 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Three viewports to scroll through.
- * Viewport 1: strike zone (Siao, pre-impact)
- * Viewport 2: where the exits land (150vh) after the blow
- * Viewport 3: where Siao lands (235vh) after tumbling down
- * overflow:hidden clips nothing at 300vh, so all three are reachable. */
+/* Two viewports:
+ * Viewport 1 (0vh - 100vh): Siao strike zone & rebirth
+ * Viewport 2 (100vh - 200vh): Exits (hello@siao.ai)
+ * Scrolling UP from Viewport 2 returns to Viewport 1 where Siao is reborn. */
 .stage {
   position: relative;
-  height: 300vh;
-  height: 300svh;
+  height: 200vh;
+  height: 200svh;
   overflow: hidden;
 }
 
@@ -229,24 +228,17 @@ a {
 
 /* ---- struck: wreck linear downward translation y(t) ----
  *
- * Exact impulse-gravity physics: y(t) = v₀⋅t + ½g⋅t² (over 1.5s).
- * - Massive initial downward velocity v₀ = 120 vh/s (direct impact kick from boulder)
- * - Downward gravity acceleration g = 4.44 vh/s²
- *
- * Linear velocity dy/dt > +120 vh/s at t=0⁺ guarantees that even with font width rotation,
- * EVERY SINGLE PIXEL on Siao moves strictly DOWNWARDS (+v) from frame 1 of impact with
- * ZERO upward (-v) movement or displacement. */
+ * Siao is launched DOWNWARDS ahead of the boulder (Y_siao >= Y_boulder at all times).
+ * The boulder NEVER passes or tunnels through Siao — the blow pushes Siao down.
+ * Linear velocity dy/dt > 0 is strictly positive (downwards) at all times (+v). */
 @keyframes struck {
   0%   { transform: translateY(0.00vh); }
-  10%  { transform: translateY(18.05vh); }
-  20%  { transform: translateY(36.20vh); }
-  30%  { transform: translateY(54.45vh); }
-  40%  { transform: translateY(72.80vh); }
-  50%  { transform: translateY(91.25vh); }
-  60%  { transform: translateY(109.80vh); }
-  70%  { transform: translateY(128.45vh); }
-  80%  { transform: translateY(147.20vh); }
-  90%  { transform: translateY(166.05vh); }
+  10%  { transform: translateY(22.00vh); }
+  20%  { transform: translateY(48.00vh); }
+  30%  { transform: translateY(78.00vh); }
+  40%  { transform: translateY(112.00vh); }
+  50%  { transform: translateY(148.00vh); }
+  60%  { transform: translateY(185.00vh); }
   100% { transform: translateY(185.00vh); }
 }
 

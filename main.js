@@ -35,6 +35,12 @@ for (const place of PLACES) {
 const root = document.documentElement;
 const first = document.querySelector(".viewport-one");
 
+/* Force manual scroll restoration so browser reloads never start scrolled down */
+if ("scrollRestoration" in history) {
+  history.scrollRestoration = "manual";
+}
+window.scrollTo(0, 0);
+
 const ms = (name) => {
   const v = getComputedStyle(root).getPropertyValue(name).trim();
   return v.endsWith("ms") ? parseFloat(v) : parseFloat(v) * 1000;
