@@ -49,13 +49,16 @@ test.describe("who is steering", () => {
     expect(y).toBe(viewport);
   });
 
-  /* settle() finishes all animations instantly — the wreck drops 85vh,
-   * placing Siao in B1. The visitor who takes the wheel is taken to B1, where Siao lies. */
-  test("going looking early still finds Siao in B1", async ({ page }) => {
+  /* The exits are carried into place by the fall rather than laid out where
+   * they end up, so anyone who arrives ahead of the fall arrives at nothing.
+   * Going looking has to be answered immediately, or the only way to make
+   * contact is invisible for several seconds. */
+  test("going looking early still finds the exits", async ({ page }) => {
     await page.goto("/");
     await page.mouse.wheel(0, 1); // the visitor takes the wheel
     await page.evaluate(() => window.scrollTo(0, window.innerHeight));
-    await expect(page.locator(".name")).toBeInViewport();
+    await expect(page.locator(".email a")).toBeInViewport();
+    await expect(page.locator(".email a")).toHaveText("hello@siao.ai");
   });
 
   test("one flick of the wheel and it stops steering", async ({ page }) => {

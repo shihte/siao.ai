@@ -35,12 +35,6 @@ for (const place of PLACES) {
 const root = document.documentElement;
 const first = document.querySelector(".viewport-one");
 
-/* Force manual scroll restoration so browser reloads never start scrolled down */
-if ("scrollRestoration" in history) {
-  history.scrollRestoration = "manual";
-}
-window.scrollTo(0, 0);
-
 const ms = (name) => {
   const v = getComputedStyle(root).getPropertyValue(name).trim();
   return v.endsWith("ms") ? parseFloat(v) : parseFloat(v) * 1000;
@@ -56,11 +50,9 @@ sessionStorage.setItem("seen", "1");
 let pending = null;
 let gliding = null;
 let handedOver = false;
-let visitorIntervened = false;
 
 function yield_() {
   handedOver = true;
-  visitorIntervened = true;
   clearTimeout(pending);
   pending = null;
   if (gliding !== null) cancelAnimationFrame(gliding);
@@ -70,10 +62,8 @@ function yield_() {
 /* Because the exits are carried down by the blow rather than laid out where
  * they end up, arriving early means arriving at nothing. So if the visitor
  * has taken the wheel and gone looking, stop performing and put everything
- * where it lands. An empty screen is a worse answer than a spoiled trick.
- * Never settle if the visitor is looking at Viewport 1 (scrollY < 100). */
+ * where it lands. An empty screen is a worse answer than a spoiled trick. */
 function settle() {
-  if (window.scrollY < 100) return;
   for (const a of document.getAnimations()) a.finish();
 }
 
@@ -81,7 +71,6 @@ function settle() {
  * of that momentum rather than into it is what makes it read as one
  * motion instead of two. */
 function glide() {
-  if (visitorIntervened) return;
   const from = window.scrollY;
   const to = window.innerHeight;
   const span = 900;
@@ -97,14 +86,12 @@ function glide() {
 }
 
 function play() {
+  yield_();
   handedOver = false;
-  for (const a of document.getAnimations()) a.cancel();
   document.body.classList.remove("act");
   void document.body.offsetWidth; // reflow, so the animations restart
   document.body.classList.add("act");
-  pending = setTimeout(() => {
-    if (!visitorIntervened) glide();
-  }, ms("--fade-in") + ms("--hold") + ms("--impact"));
+  pending = setTimeout(glide, ms("--fade-in") + ms("--hold") + ms("--impact"));
 }
 
 /* Any sign of intent from the visitor and the page stops steering. */
@@ -118,36 +105,21 @@ addEventListener("pointerdown", yield_, { passive: true });
 addEventListener("keydown", (e) => { if (SCROLL_KEYS.has(e.key)) yield_(); });
 
 if (!stillness.matches) {
+  /* Only now do the exits move above the fold. Until this class exists they
+   * are laid out a viewport down, where someone without JS can still find
+   * them. */
   root.classList.add("motion");
 
-  /* The browser sometimes restores scroll position across refreshes within
-   * the same session. If the page reloads at scrollY > 0, viewport-one is
-   * off-screen and the IntersectionObserver never fires play(). Forcing
-   * scrollY = 0 here guarantees the act always starts on a clean slate. */
-  window.scrollTo(0, 0);
-
-  /* Looking at the first viewport is the cue the act needs — lowering the
-   * threshold to 0.2 ensures returning visitors see Siao immediately reborn. */
+  /* Looking at the first viewport is the only cue the act needs — it covers
+   * the first visit and every return alike. */
   new IntersectionObserver(
     ([entry]) => {
       if (entry.isIntersecting) play();
       else {
         clearTimeout(pending);
-        if (handedOver && window.scrollY > 100) settle();
+        if (handedOver) settle();
       }
     },
-    { threshold: 0.2 }
+    { threshold: 0.95 }
   ).observe(first);
-
-  let wasFallen = false;
-
-  /* Returning near top (scrollY <= 50) after scrolling down guarantees play() reset. */
-  addEventListener("scroll", () => {
-    if (window.scrollY > 100) {
-      wasFallen = true;
-    } else if (window.scrollY <= 50 && wasFallen) {
-      wasFallen = false;
-      play();
-    }
-  }, { passive: true });
 }

@@ -12,15 +12,12 @@
 <body>
 
 <main class="stage">
-  <!-- Viewport 1 trigger -->
+  <!-- Nothing to see: it exists so the page can tell when you are looking at
+       the first viewport, which is the cue the whole act runs from. -->
   <div class="viewport-one" aria-hidden="true"></div>
 
-  <!-- One rigid body (.wreck).
-       The exits sit at a LOCKED ABSOLUTE DISTANCE (100vh) ABOVE Siao (in 2F / -50vh at rest).
-       During rest (1F / 50vh): Siao is at 50vh (1F), Mail is at -50vh (2F, hidden above).
-       When struck: Whole rigid body falls 100vh together.
-       Mail lands at 50vh (1F), Siao lands at 150vh (B1).
-       Exits is inside .wreck (distance locked), but outside .card (does NOT rotate). -->
+  <!-- One body. The exits sit a fixed distance above the name and everything
+       here moves together, because it is all struck by the same blow. -->
   <div class="wreck">
     <section class="exits" aria-label="Elsewhere">
       <ul class="places" id="places"></ul>
@@ -28,10 +25,8 @@
       <p class="email"><a href="mailto:hello@siao.ai">hello@siao.ai</a></p>
     </section>
 
-    <div class="card">
-      <h1 class="name">Siao</h1>
-      <p class="statement">The summit is a lie. The boulder is real.</p>
-    </div>
+    <h1 class="name">Siao</h1>
+    <p class="statement">The summit is a lie. The boulder is real.</p>
   </div>
 
   <div class="boulder" aria-hidden="true">

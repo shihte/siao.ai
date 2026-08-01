@@ -3,7 +3,7 @@
   src: url("/fonts/eb-garamond-latin.woff2") format("woff2");
   font-weight: 400 500;
   font-style: normal;
-  font-display: block;
+  font-display: block; /* block, not swap: a flash of the wrong serif is worse than a moment of nothing */
 }
 
 :root {
@@ -12,36 +12,34 @@
   --ink-dim: #6E6B65;
   --name-fs: clamp(4.5rem, 32vw, 22rem);
 
-  /* ---- 2F - 1F - B1 Locked Geometry ----
+  /* ---- The geometry ----
    *
-   * Absolute distance between Mail (in 2F) and Siao (in 1F) is LOCKED at 100vh (1 Floor).
+   * Everything is measured from the name's centre, which sits at 50vh while
+   * the page is at rest.
    *
-   * BEFORE STRIKE (Rest State at scrollY = 0):
-   *   2F (-50vh):  Mail (top: -100vh relative to wreck at 50vh, hidden above 1F)
-   *   1F (50vh):   Siao (centered in 1F)
-   *   B1 (150vh):  Empty
-   *
-   * AFTER STRIKE (Fall 100vh):
-   *   2F (-50vh):  Empty
-   *   1F (50vh):   Mail (pushed down 100vh into 1F, centered at 50vh in 1F!)
-   *   B1 (150vh):  Siao (pushed down 100vh into B1, lying tilted at 150vh in B1!)
-   *
-   * Camera glides to B1 (scrollY = 100vh), where visitor sees Siao lying in B1.
-   * Visitor scrolling back UP to 1F (scrollY <= 50) resets everything back to:
-   *   2F: Mail
-   *   1F: Siao (reborn, ready to play again!)
-   *   B1: Empty */
-  --gap: 0.58;
-  --D: 100vh;
-  --delta: 100vh;
+   *   --gap   how far the statement sits below the name
+   *   --D     how far the exits sit ABOVE the name. Fixed, by hand: this is
+   *           the "absolute distance" that ties the two together. Large
+   *           enough that the exits start off-screen.
+   *   --delta how far the whole body travels when it is struck. It is
+   *           100vh + D and nothing else: one viewport for the camera to
+   *           descend, plus the D that brings the exits down to where the
+   *           camera will be looking. Change D and this follows. */
+  --gap: 0.58;   /* as a multiple of the name's size, so it scales with it */
+  --D: 85vh;
+  --delta: 185vh;
 
+  /* ---- The choreography ---- */
   --fade-in: 0.5s;
   --hold: 5s;
-  --fall: 2s;
+  --fall: 2s;      /* boulder: from above the page to below it */
+  /* When the boulder's centre reaches the name's, which is at exactly 50vh.
+   * The boulder travels -25vh → 260vh as t², so 50vh is at
+   * sqrt(75/285) = 0.513 of the fall. Derived, not chosen. */
   --impact: 1.026s;
-  --drop: 1.5s;
+  --drop: 1.5s;    /* how long the struck body takes to land */
 
-  color-scheme: only light;
+  color-scheme: only light; /* the colours are the design, not a preference */
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -56,6 +54,8 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Two viewports to scroll through; anything that falls out is clipped rather
+ * than dragging the scrollbar along with it. */
 .stage {
   position: relative;
   height: 200vh;
@@ -72,58 +72,13 @@ body {
   pointer-events: none;
 }
 
-/* One rigid body (.wreck).
-   Starts at 50vh (1F). Translates 100vh when struck. Never rotates. */
+/* The origin of this element is the name's centre. Everything inside is
+ * placed relative to that, so the distances between them are constants. */
 .wreck {
   position: absolute;
   top: 50vh;
   left: 0;
   right: 0;
-  z-index: 1;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .wreck { transform: translateY(100vh); }
-}
-
-/* Exits sits at locked distance D (100vh) ABOVE Siao (in 2F / -50vh at rest).
-   Starts at -50vh (2F, hidden above), falls to 50vh (1F) when struck. Level, unrotated. */
-.exits {
-  position: absolute;
-  top: calc(-1 * var(--D));
-  left: 0;
-  right: 0;
-  padding: 0 7vw;
-  transform: translateY(-50%);
-}
-
-.places { list-style: none; }
-
-.places li,
-.email {
-  font-size: clamp(1rem, 1.6vw, 1.25rem);
-  line-height: 2;
-}
-
-.places li:not(:has(a)) { color: var(--ink-dim); }
-
-.places:not(:empty) + .email { margin-top: 2.5rem; }
-
-a {
-  color: inherit;
-  text-decoration: none;
-  border-bottom: 1px solid currentColor;
-  padding-bottom: 0.08em;
-}
-
-/* .card holds only Siao and statement.
-   Rotates and drifts horizontally around top-left impact point (0 0). */
-.card {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  transform-origin: 0 0;
 }
 
 .name {
@@ -150,16 +105,50 @@ a {
   color: var(--ink-dim);
 }
 
+/* Without JS, or with motion turned off, nothing ever falls — so the exits
+ * are laid out where a reader would scroll to find them, one viewport down. */
+.exits {
+  position: absolute;
+  top: 100vh;
+  left: 0;
+  right: 0;
+  padding: 0 7vw;
+  transform: translateY(-50%);
+}
+
+/* With motion, they wait above the fold instead, a fixed D from the name. */
+html.motion .exits { top: calc(-1 * var(--D)); }
+
+.places { list-style: none; }
+
+.places li,
+.email {
+  font-size: clamp(1rem, 1.6vw, 1.25rem);
+  line-height: 2;
+}
+
+.places li:not(:has(a)) { color: var(--ink-dim); }
+
+.places:not(:empty) + .email { margin-top: 2.5rem; }
+
+a {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
+  padding-bottom: 0.08em;
+}
+
 /* ---- The boulder ---- */
 
 .boulder {
   position: absolute;
+  /* Offset by half its own size so translate() addresses the boulder's centre,
+   * not its top-left corner — otherwise it "lands" a whole radius too low. */
   top: calc(var(--name-fs) * -0.225);
   left: calc(var(--name-fs) * -0.225);
-  width: calc(var(--name-fs) * 0.45);
+  width: calc(var(--name-fs) * 0.45); /* ~65% of the name's cap height */
   transform: translateX(33vw);
   visibility: hidden;
-  z-index: 2;
 }
 
 .boulder svg {
@@ -174,7 +163,21 @@ a {
   .boulder { display: none; }
 }
 
-/* ---- Keyframe animations ---- */
+/* ---- The fall ----
+ *
+ * Position under constant acceleration goes as t², so the vertical keyframes
+ * are a parabola sampled every 10% and played back linearly. Easing curves
+ * only approximate this; the samples are exact.
+ *
+ * The boulder travels -25vh → 260vh, far enough to leave the page entirely
+ * rather than parking itself in the second viewport. It meets the name's
+ * centre at 50vh — see --impact for the arithmetic. Move the name and that
+ * must be re-derived, not nudged.
+ *
+ * It is NOT re-derived for the statement. The body starts moving the instant
+ * the name is hit, so by the time the boulder reaches the line it has already
+ * dropped a little — the boulder catches it because it is falling faster, the
+ * way it would. That contact is measured, not scheduled. */
 
 @keyframes boulder-x {
   from { transform: translateX(33vw); }
@@ -182,63 +185,50 @@ a {
 }
 
 @keyframes boulder-y {
-  0%    { transform: translateY(-25.0vh) rotate(0deg); }
-  10%   { transform: translateY(-22.2vh) rotate(29deg); }
-  20%   { transform: translateY(-13.6vh) rotate(58deg); }
-  30%   { transform: translateY(0.7vh)   rotate(87deg); }
-  40%   { transform: translateY(20.6vh)  rotate(116deg); }
-  50%   { transform: translateY(46.3vh)  rotate(145deg); }
-  51.3% { transform: translateY(50.0vh)  rotate(148deg); }
-  60%   { transform: translateY(69.1vh)  rotate(175deg); }
-  70%   { transform: translateY(105.8vh) rotate(208deg); }
-  80%   { transform: translateY(149.6vh) rotate(242deg); }
-  90%   { transform: translateY(201.0vh) rotate(276deg); }
-  100%  { transform: translateY(260.0vh) rotate(310deg); }
+  0%   { transform: translateY(-25.0vh) rotate(0deg); }
+  10%  { transform: translateY(-22.2vh) rotate(29deg); }
+  20%  { transform: translateY(-13.6vh) rotate(58deg); }
+  30%  { transform: translateY(0.7vh)   rotate(87deg); }
+  40%  { transform: translateY(20.6vh)  rotate(116deg); }
+  50%  { transform: translateY(46.3vh)  rotate(145deg); }
+  60%  { transform: translateY(77.6vh)  rotate(174deg); }
+  70%  { transform: translateY(114.7vh) rotate(203deg); }
+  80%  { transform: translateY(157.4vh) rotate(232deg); }
+  90%  { transform: translateY(205.9vh) rotate(261deg); }
+  100% { transform: translateY(260.0vh) rotate(290deg); }
 }
 
-/* Wreck translates 100vh straight down:
-   Mail: -50vh →  50vh (lands in 1F)
-   Siao:  50vh → 150vh (lands in B1) */
+/* One blow, one body, one trajectory. The exits do not have an entrance of
+ * their own — they arrive because the name was hit. */
 @keyframes struck {
-  0%   { transform: translateY(0.00vh); }
-  10%  { transform: translateY(18.05vh); }
-  20%  { transform: translateY(36.20vh); }
-  30%  { transform: translateY(54.45vh); }
-  40%  { transform: translateY(72.80vh); }
-  50%  { transform: translateY(91.25vh); }
-  60%  { transform: translateY(100.00vh); }
-  100% { transform: translateY(100.00vh); }
-}
-
-@keyframes tumble {
-  0%   { transform: translateX(0.00vw) rotate(0.00deg); }
-  10%  { transform: translateX(0.91vw) rotate(2.90deg); }
-  20%  { transform: translateX(1.48vw) rotate(4.75deg); }
-  30%  { transform: translateX(1.85vw) rotate(5.93deg); }
-  40%  { transform: translateX(2.09vw) rotate(6.68deg); }
-  50%  { transform: translateX(2.24vw) rotate(7.16deg); }
-  60%  { transform: translateX(2.33vw) rotate(7.46deg); }
-  70%  { transform: translateX(2.39vw) rotate(7.66deg); }
-  80%  { transform: translateX(2.43vw) rotate(7.78deg); }
-  90%  { transform: translateX(2.46vw) rotate(7.86deg); }
-  100% { transform: translateX(2.50vw) rotate(8.00deg); }
+  0%   { transform: translateY(0); }
+  10%  { transform: translateY(1.9vh); }
+  20%  { transform: translateY(7.4vh); }
+  30%  { transform: translateY(16.7vh); }
+  40%  { transform: translateY(29.6vh); }
+  50%  { transform: translateY(46.3vh); }
+  60%  { transform: translateY(66.6vh); }
+  70%  { transform: translateY(90.7vh); }
+  80%  { transform: translateY(118.4vh); }
+  90%  { transform: translateY(149.9vh); }
+  100% { transform: translateY(185vh); }
 }
 
 @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
 
+/* One class drives the whole act, so restarting it is: remove, reflow, add.
+ * Every delay below is measured from that single moment. */
+
 :root { --strike: calc(var(--fade-in) + var(--hold)); }
 
 body.act .name,
-body.act .statement {
+body.act .statement,
+body.act .exits {
   animation: fade-in var(--fade-in) ease-out both;
 }
 
 body.act .wreck {
   animation: struck var(--drop) linear calc(var(--strike) + var(--impact)) both;
-}
-
-body.act .card {
-  animation: tumble var(--drop) ease-out calc(var(--strike) + var(--impact)) both;
 }
 
 body.act .boulder {
