@@ -14,35 +14,22 @@
 
   /* ---- The geometry ----
    *
-   * Everything is measured from the name's centre, which sits at 50vh while
-   * the page is at rest.
+   * Viewport 1 (0vh - 100vh): Siao strike zone & rebirth
+   * Viewport 2 (100vh - 200vh): Exits (hello@siao.ai) at 150vh
    *
-   *   --gap   how far the statement sits below the name
-   *   --D     how far the exits sit ABOVE the name's centre. Large enough
-   *           that exits start off-screen above during the 5s hold.
-   *   --delta how far the whole body travels when struck:
-   *           100vh (camera descends one viewport) + D (brings exits down
-   *           to the camera's new position). Change D and this follows.
-   *
-   * After the blow:
-   *   exits  →  -35vh + 185vh  = 150vh  (centre of Viewport 2)
-   *   Siao   →   50vh + 185vh  = 235vh  (within Viewport 3)
-   *   Stage must be 300vh so Siao is not clipped by overflow:hidden. */
-  --gap: 0.58;   /* as a multiple of the name's size, so it scales with it */
-  --D: 85vh;
-  --delta: 185vh;
+   * Siao starts at 50vh. When struck, wreck falls 100vh into Viewport 2 (150vh).
+   * Exits is static in Viewport 2 (150vh) — never moves, never tilts, never dragged down. */
+  --gap: 0.58;
+  --delta: 100vh;
 
   /* ---- The choreography ---- */
   --fade-in: 0.5s;
   --hold: 5s;
   --fall: 2s;      /* boulder: from above the page to below it */
-  /* When the boulder's centre reaches the name's, which is at exactly 50vh.
-   * The boulder travels -25vh → 260vh as t², so 50vh is at
-   * sqrt(75/285) = 0.513 of the fall. Derived, not chosen. */
   --impact: 1.026s;
   --drop: 1.5s;    /* how long the struck body takes to land */
 
-  color-scheme: only light; /* the colours are the design, not a preference */
+  color-scheme: only light;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -57,10 +44,6 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Two viewports:
- * Viewport 1 (0vh - 100vh): Siao strike zone & rebirth
- * Viewport 2 (100vh - 200vh): Exits (hello@siao.ai)
- * Scrolling UP from Viewport 2 returns to Viewport 1 where Siao is reborn. */
 .stage {
   position: relative;
   height: 200vh;
@@ -77,30 +60,23 @@ body {
   pointer-events: none;
 }
 
-/* The origin of this element is the name's centre. Everything inside is
- * placed relative to that, so the distances between them are constants.
- * The wreck ONLY translates — it never rotates. Rotation belongs to .card. */
+/* Wreck starts at 50vh (Viewport 1 centre).
+ * Z-index 1 keeps it behind the boulder (z-index 2). */
 .wreck {
   position: absolute;
   top: 50vh;
   left: 0;
   right: 0;
-  /* Sits behind the boulder so the rock visually strikes from the front. */
   z-index: 1;
 }
 
-/* Reduced-motion: no animation runs, so wreck never moves on its own.
- * Jump it straight to the settled position so exits at 150vh and Siao at
- * 235vh are reachable by scrolling. */
 @media (prefers-reduced-motion: reduce) {
-  .wreck { transform: translateY(185vh); }
+  .wreck { transform: translateY(100vh); }
 }
 
-/* .card holds only the name and statement. It sits at the wreck's origin
- * and is the only element that rotates and drifts horizontally.
- * transform-origin: 0 0 sets the rotation pivot at the top-left impact point
- * where the boulder strikes, ensuring that clockwise rotation swings all points
- * downwards (+v) with zero upward (-v) flight. */
+/* .card holds only the name and statement.
+ * transform-origin: 0 0 sets rotation pivot at top-left impact point,
+ * guaranteeing zero upward (-v) flight. */
 .card {
   position: absolute;
   top: 0;
@@ -133,12 +109,11 @@ body {
   color: var(--ink-dim);
 }
 
+/* Exits is fixed in Viewport 2 at 150vh.
+ * Never inside wreck, never receives transform/rotate, never gets dragged down. */
 .exits {
   position: absolute;
-  /* Sits exactly D above the name's centre (which is at wreck top = 0).
-   * With D = 85vh, exits is at 50vh - 85vh = -35vh from stage top while
-   * the wreck is at rest: off-screen above, invisible during the hold. */
-  top: calc(-1 * var(--D));
+  top: 150vh;
   left: 0;
   right: 0;
   padding: 0 7vw;
@@ -173,8 +148,6 @@ a {
   width: calc(var(--name-fs) * 0.45);
   transform: translateX(33vw);
   visibility: hidden;
-  /* The rock must be in front of Siao so the collision is visible.
-   * z-index 2 puts it above the wreck (z-index 1). */
   z-index: 2;
 }
 
@@ -190,27 +163,13 @@ a {
   .boulder { display: none; }
 }
 
-/* ---- The fall ---- */
+/* ---- Keyframe animations ---- */
 
 @keyframes boulder-x {
   from { transform: translateX(33vw); }
   to   { transform: translateX(56vw); }
 }
 
-/* ---- The fall: 2D rigid-body collision physics ---- */
-
-@keyframes boulder-x {
-  from { transform: translateX(33vw); }
-  to   { transform: translateX(56vw); }
-}
-
-/* Boulder physics:
- * Free-fall under gravity y(t) = -25vh + 71.25 t² (over 2.0s).
- * At t = 1.026s (51.3%), the boulder hits Siao at 50vh.
- * Upon impact, it transfers momentum to Siao. The boulder's downward speed
- * drops slightly from 146vh/s to 110vh/s as it pushes Siao, then resumes
- * accelerating downwards under gravity.
- * Velocity dy/dt > 0 is strictly positive (downwards) at all times — no holding, no bouncing. */
 @keyframes boulder-y {
   0%    { transform: translateY(-25.0vh) rotate(0deg); }
   10%   { transform: translateY(-22.2vh) rotate(29deg); }
@@ -226,30 +185,20 @@ a {
   100%  { transform: translateY(260.0vh) rotate(310deg); }
 }
 
-/* ---- struck: wreck linear downward translation y(t) ----
- *
- * Siao is launched DOWNWARDS ahead of the boulder (Y_siao >= Y_boulder at all times).
- * The boulder NEVER passes or tunnels through Siao — the blow pushes Siao down.
- * Linear velocity dy/dt > 0 is strictly positive (downwards) at all times (+v). */
+/* Wreck drops 100vh to Viewport 2 (150vh).
+ * Siao lands in Viewport 2 alongside the email.
+ * Speed dy/dt > +120vh/s guarantees zero upward velocity at all times. */
 @keyframes struck {
   0%   { transform: translateY(0.00vh); }
-  10%  { transform: translateY(22.00vh); }
-  20%  { transform: translateY(48.00vh); }
-  30%  { transform: translateY(78.00vh); }
-  40%  { transform: translateY(112.00vh); }
-  50%  { transform: translateY(148.00vh); }
-  60%  { transform: translateY(185.00vh); }
-  100% { transform: translateY(185.00vh); }
+  10%  { transform: translateY(18.05vh); }
+  20%  { transform: translateY(36.20vh); }
+  30%  { transform: translateY(54.45vh); }
+  40%  { transform: translateY(72.80vh); }
+  50%  { transform: translateY(91.25vh); }
+  60%  { transform: translateY(100.00vh); }
+  100% { transform: translateY(100.00vh); }
 }
 
-/* ---- tumble: angular & horizontal momentum transferred to Siao ----
- *
- * 1. Controlled rotational tilt: θ(t) = 8.0° ⋅ (1 - e⁻³˙⁰ᵗ)
- *    Subtle, heavy impact tilt (8°) matching a massive object struck from above.
- * 2. Horizontal momentum: x(t) = 2.5vw ⋅ (1 - e⁻³˙⁰ᵗ)
- *    Rightward impulse inherited from boulder's left-to-right impact trajectory.
- *
- * Applied around transform-origin: 50% 0 (center of Siao). */
 @keyframes tumble {
   0%   { transform: translateX(0.00vw) rotate(0.00deg); }
   10%  { transform: translateX(0.91vw) rotate(2.90deg); }
@@ -266,23 +215,17 @@ a {
 
 @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
 
-/* One class drives the whole act, so restarting it is: remove, reflow, add.
- * Every delay below is measured from that single moment. */
-
 :root { --strike: calc(var(--fade-in) + var(--hold)); }
 
-/* Siao and statement fade in at the very top of the act. */
 body.act .name,
 body.act .statement {
   animation: fade-in var(--fade-in) ease-out both;
 }
 
-/* The entire wreck descends at impact — exits travels with it, level. */
 body.act .wreck {
   animation: struck var(--drop) linear calc(var(--strike) + var(--impact)) both;
 }
 
-/* Only the card rotates: exits is a sibling of .card, so it is spared. */
 body.act .card {
   animation: tumble var(--drop) ease-out calc(var(--strike) + var(--impact)) both;
 }
