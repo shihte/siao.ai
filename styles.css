@@ -195,60 +195,71 @@ a {
 }
 
 /* t² free-fall from -25vh to 260vh (285vh span in 2 s).
- * Around 51.3% (the impact moment) the boulder briefly decelerates —
- * as if something pushed back — then resumes and accelerates away.
- * This is what makes the collision feel physical rather than coincidental. */
+ * At 51.3% the boulder reaches Siao (50vh). It then HOLDS at 50vh for 5%
+ * of the animation (100ms) — visibly stuck against the mass it just hit —
+ * before punching through and resuming. The hold is what makes the
+ * collision feel like contact rather than coincidence. */
 @keyframes boulder-y {
   0%    { transform: translateY(-25.0vh) rotate(0deg); }
   10%   { transform: translateY(-22.2vh) rotate(29deg); }
   20%   { transform: translateY(-13.6vh) rotate(58deg); }
   30%   { transform: translateY(0.7vh)   rotate(87deg); }
   40%   { transform: translateY(20.6vh)  rotate(116deg); }
-  /* Approaching Siao at speed */
   48%   { transform: translateY(41.8vh)  rotate(141deg); }
-  /* IMPACT — boulder sticks for one beat, Siao pushes back */
+  /* IMPACT: boulder arrives at Siao's centre */
   51.3% { transform: translateY(50.0vh)  rotate(148deg); }
-  53%   { transform: translateY(51.8vh)  rotate(151deg); }
-  /* Momentum wins; boulder punches through and accelerates */
-  58%   { transform: translateY(68.2vh)  rotate(163deg); }
-  70%   { transform: translateY(114.7vh) rotate(212deg); }
-  80%   { transform: translateY(157.4vh) rotate(244deg); }
-  90%   { transform: translateY(205.9vh) rotate(276deg); }
+  /* HOLD — boulder is pressed against Siao, transferring momentum */
+  56.3% { transform: translateY(50.0vh)  rotate(162deg); }
+  /* Boulder punches through and continues down */
+  62%   { transform: translateY(80.0vh)  rotate(185deg); }
+  72%   { transform: translateY(122.0vh) rotate(220deg); }
+  82%   { transform: translateY(165.0vh) rotate(252deg); }
+  92%   { transform: translateY(212.0vh) rotate(284deg); }
   100%  { transform: translateY(260.0vh) rotate(310deg); }
 }
 
 /* ---- struck: wreck translates straight down, no rotation ----
  *
- * Rotation is the card's job (see @keyframes tumble).
- * Keeping the two transforms separate means exits inherits the translation
- * but never the spin: it arrives at 150vh perfectly level. */
+ * This is v₀⋅t + ½g⋅t² physics, not a pure t² free-fall.
+ * The boulder transfers momentum at impact, giving the wreck an
+ * immediate initial velocity v₀ ≈ 73vh/s (half of boulder's impact speed).
+ * Gravity g then adds to that. Result: the wreck launches fast
+ * and decelerates relative to a pure free-fall — it was pushed, not dropped.
+ *
+ * Exits inherits this translation and arrives at 150vh perfectly level.
+ * Rotation and lateral drift belong to .card (see @keyframes tumble). */
 @keyframes struck {
   0%   { transform: translateY(0); }
-  10%  { transform: translateY(1.9vh); }
-  20%  { transform: translateY(7.4vh); }
-  30%  { transform: translateY(16.7vh); }
-  40%  { transform: translateY(29.6vh); }
-  50%  { transform: translateY(46.3vh); }
-  60%  { transform: translateY(66.6vh); }
-  70%  { transform: translateY(90.7vh); }
-  80%  { transform: translateY(118.4vh); }
-  90%  { transform: translateY(149.9vh); }
+  10%  { transform: translateY(11.7vh); }
+  20%  { transform: translateY(24.9vh); }
+  30%  { transform: translateY(39.6vh); }
+  40%  { transform: translateY(55.9vh); }
+  50%  { transform: translateY(73.6vh); }
+  60%  { transform: translateY(92.8vh); }
+  70%  { transform: translateY(113.6vh); }
+  80%  { transform: translateY(135.8vh); }
+  90%  { transform: translateY(159.6vh); }
   100% { transform: translateY(185vh); }
 }
 
-/* ---- tumble: the card (Siao + statement) spins on impact ----
+/* ---- tumble: the card (Siao + statement) spins AND drifts rightward ----
  *
- * Fast initial angular acceleration — the boulder's angular momentum
- * transfers instantly — then the spin decelerates as air resistance wins.
- * ease-out on the animation curve alone isn't enough; the keyframe
- * distribution does the heavy lifting. */
+ * The boulder travels from left to right (33vw → 56vw) and strikes
+ * from the upper-right. Physics demands Siao move in the direction of
+ * the force: DOWN (from wreck's struck) and RIGHT (from tumble's translateX).
+ * The rotation is clockwise — upper-right of Siao gets pushed right,
+ * lower-left swings left and up, exactly as impact dictates.
+ *
+ * Angular momentum profile: fast initial spin (impact kick), then
+ * decelerating rotation (air damping). */
 @keyframes tumble {
-  0%   { transform: rotate(0deg); }
-  12%  { transform: rotate(15deg); }
-  28%  { transform: rotate(28deg); }
-  50%  { transform: rotate(34deg); }
-  75%  { transform: rotate(37deg); }
-  100% { transform: rotate(38deg); }
+  0%   { transform: translateX(0)      rotate(0deg); }
+  10%  { transform: translateX(1.8vw)  rotate(15deg); }
+  20%  { transform: translateX(3.0vw)  rotate(25deg); }
+  30%  { transform: translateX(3.8vw)  rotate(30deg); }
+  50%  { transform: translateX(4.5vw)  rotate(35deg); }
+  75%  { transform: translateX(4.8vw)  rotate(37deg); }
+  100% { transform: translateX(5vw)    rotate(38deg); }
 }
 
 @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }

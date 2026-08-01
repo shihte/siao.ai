@@ -107,6 +107,12 @@ addEventListener("keydown", (e) => { if (SCROLL_KEYS.has(e.key)) yield_(); });
 if (!stillness.matches) {
   root.classList.add("motion");
 
+  /* The browser sometimes restores scroll position across refreshes within
+   * the same session. If the page reloads at scrollY > 0, viewport-one is
+   * off-screen and the IntersectionObserver never fires play(). Forcing
+   * scrollY = 0 here guarantees the act always starts on a clean slate. */
+  window.scrollTo(0, 0);
+
   /* Looking at the first viewport is the cue the act needs — lowering the
    * threshold to 0.2 ensures returning visitors see Siao immediately reborn. */
   new IntersectionObserver(
