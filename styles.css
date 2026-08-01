@@ -109,15 +109,12 @@ body {
  * are laid out where a reader would scroll to find them, one viewport down. */
 .exits {
   position: absolute;
-  top: 100vh;
+  top: 150vh;
   left: 0;
   right: 0;
   padding: 0 7vw;
   transform: translateY(-50%);
 }
-
-/* With motion, they wait above the fold instead, a fixed D from the name. */
-html.motion .exits { top: calc(-1 * var(--D)); }
 
 .places { list-style: none; }
 
@@ -171,13 +168,7 @@ a {
  *
  * The boulder travels -25vh → 260vh, far enough to leave the page entirely
  * rather than parking itself in the second viewport. It meets the name's
- * centre at 50vh — see --impact for the arithmetic. Move the name and that
- * must be re-derived, not nudged.
- *
- * It is NOT re-derived for the statement. The body starts moving the instant
- * the name is hit, so by the time the boulder reaches the line it has already
- * dropped a little — the boulder catches it because it is falling faster, the
- * way it would. That contact is measured, not scheduled. */
+ * centre at 50vh — see --impact for the arithmetic. */
 
 @keyframes boulder-x {
   from { transform: translateX(33vw); }
@@ -198,20 +189,19 @@ a {
   100% { transform: translateY(260.0vh) rotate(290deg); }
 }
 
-/* One blow, one body, one trajectory. The exits do not have an entrance of
- * their own — they arrive because the name was hit. */
+/* Impact: rotational tilt & downward acceleration on the struck body */
 @keyframes struck {
-  0%   { transform: translateY(0); }
-  10%  { transform: translateY(1.9vh); }
-  20%  { transform: translateY(7.4vh); }
-  30%  { transform: translateY(16.7vh); }
-  40%  { transform: translateY(29.6vh); }
-  50%  { transform: translateY(46.3vh); }
-  60%  { transform: translateY(66.6vh); }
-  70%  { transform: translateY(90.7vh); }
-  80%  { transform: translateY(118.4vh); }
-  90%  { transform: translateY(149.9vh); }
-  100% { transform: translateY(185vh); }
+  0%   { transform: translateY(0) rotate(0deg); }
+  10%  { transform: translateY(1.9vh) rotate(2deg); }
+  20%  { transform: translateY(7.4vh) rotate(5deg); }
+  30%  { transform: translateY(16.7vh) rotate(9deg); }
+  40%  { transform: translateY(29.6vh) rotate(14deg); }
+  50%  { transform: translateY(46.3vh) rotate(19deg); }
+  60%  { transform: translateY(66.6vh) rotate(24deg); }
+  70%  { transform: translateY(90.7vh) rotate(29deg); }
+  80%  { transform: translateY(118.4vh) rotate(33deg); }
+  90%  { transform: translateY(149.9vh) rotate(36deg); }
+  100% { transform: translateY(185vh) rotate(38deg); }
 }
 
 @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }

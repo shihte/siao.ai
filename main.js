@@ -105,13 +105,10 @@ addEventListener("pointerdown", yield_, { passive: true });
 addEventListener("keydown", (e) => { if (SCROLL_KEYS.has(e.key)) yield_(); });
 
 if (!stillness.matches) {
-  /* Only now do the exits move above the fold. Until this class exists they
-   * are laid out a viewport down, where someone without JS can still find
-   * them. */
   root.classList.add("motion");
 
-  /* Looking at the first viewport is the only cue the act needs — it covers
-   * the first visit and every return alike. */
+  /* Looking at the first viewport is the cue the act needs — lowering the
+   * threshold to 0.2 ensures returning visitors see Siao immediately reborn. */
   new IntersectionObserver(
     ([entry]) => {
       if (entry.isIntersecting) play();
@@ -120,6 +117,6 @@ if (!stillness.matches) {
         if (handedOver) settle();
       }
     },
-    { threshold: 0.95 }
+    { threshold: 0.2 }
   ).observe(first);
 }
