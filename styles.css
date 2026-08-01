@@ -99,13 +99,15 @@ body {
 
 /* .card holds only the name and statement. It sits at the wreck's origin
  * and is the only element that rotates and drifts horizontally.
- * transform-origin: 50% 0 places the rotation pivot at the exact centre of Siao. */
+ * transform-origin: 0 0 sets the rotation pivot at the top-left impact point
+ * where the boulder strikes, ensuring that clockwise rotation swings all points
+ * downwards (+v) with zero upward (-v) flight. */
 .card {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  transform-origin: 50% 0;
+  transform-origin: 0 0;
 }
 
 .name {
@@ -228,47 +230,46 @@ a {
 /* ---- struck: wreck linear downward translation y(t) ----
  *
  * Exact impulse-gravity physics: y(t) = v₀⋅t + ½g⋅t² (over 1.5s).
- * - Initial downward velocity v₀ = 80 vh/s (impulse kick from boulder at t=0⁺)
- * - Downward gravity acceleration g = 57.78 vh/s²
+ * - Massive initial downward velocity v₀ = 120 vh/s (direct impact kick from boulder)
+ * - Downward gravity acceleration g = 4.44 vh/s²
  *
- * Linear velocity dy/dt = v₀ + gt > 0 starts at +80 vh/s immediately on impact.
- * Because v₀ > (W/2)⋅ω₀, every single pixel of Siao moves strictly DOWNWARDS (+v)
- * from frame 1 of impact with ZERO upward (-v) movement. */
+ * Linear velocity dy/dt > +120 vh/s at t=0⁺ guarantees that even with font width rotation,
+ * EVERY SINGLE PIXEL on Siao moves strictly DOWNWARDS (+v) from frame 1 of impact with
+ * ZERO upward (-v) movement or displacement. */
 @keyframes struck {
   0%   { transform: translateY(0.00vh); }
-  10%  { transform: translateY(12.65vh); }
-  20%  { transform: translateY(26.60vh); }
-  30%  { transform: translateY(41.85vh); }
-  40%  { transform: translateY(58.40vh); }
-  50%  { transform: translateY(76.25vh); }
-  60%  { transform: translateY(95.40vh); }
-  70%  { transform: translateY(115.85vh); }
-  80%  { transform: translateY(137.60vh); }
-  90%  { transform: translateY(160.65vh); }
+  10%  { transform: translateY(18.05vh); }
+  20%  { transform: translateY(36.20vh); }
+  30%  { transform: translateY(54.45vh); }
+  40%  { transform: translateY(72.80vh); }
+  50%  { transform: translateY(91.25vh); }
+  60%  { transform: translateY(109.80vh); }
+  70%  { transform: translateY(128.45vh); }
+  80%  { transform: translateY(147.20vh); }
+  90%  { transform: translateY(166.05vh); }
   100% { transform: translateY(185.00vh); }
 }
 
 /* ---- tumble: angular & horizontal momentum transferred to Siao ----
  *
- * 1. Rotational momentum: θ(t) = 36.8° ⋅ (1 - e⁻²˙²ᵗ)
- *    Inherits clockwise angular velocity ω₀ = 81°/s from boulder's spin,
- *    decaying via air resistance.
- * 2. Horizontal momentum: x(t) = 4.0vw ⋅ (1 - e⁻²˙⁰ᵗ)
- *    Inherits rightward impulse from boulder's left-to-right path (33vw → 56vw).
+ * 1. Controlled rotational tilt: θ(t) = 8.0° ⋅ (1 - e⁻³˙⁰ᵗ)
+ *    Subtle, heavy impact tilt (8°) matching a massive object struck from above.
+ * 2. Horizontal momentum: x(t) = 2.5vw ⋅ (1 - e⁻³˙⁰ᵗ)
+ *    Rightward impulse inherited from boulder's left-to-right impact trajectory.
  *
  * Applied around transform-origin: 50% 0 (center of Siao). */
 @keyframes tumble {
-  0%   { transform: translateX(0.00vw) rotate(0.0deg); }
-  10%  { transform: translateX(1.04vw) rotate(10.3deg); }
-  20%  { transform: translateX(1.80vw) rotate(17.8deg); }
-  30%  { transform: translateX(2.37vw) rotate(23.1deg); }
-  40%  { transform: translateX(2.80vw) rotate(27.0deg); }
-  50%  { transform: translateX(3.11vw) rotate(29.7deg); }
-  60%  { transform: translateX(3.34vw) rotate(31.7deg); }
-  70%  { transform: translateX(3.51vw) rotate(33.1deg); }
-  80%  { transform: translateX(3.64vw) rotate(34.2deg); }
-  90%  { transform: translateX(3.73vw) rotate(34.9deg); }
-  100% { transform: translateX(3.80vw) rotate(35.0deg); }
+  0%   { transform: translateX(0.00vw) rotate(0.00deg); }
+  10%  { transform: translateX(0.91vw) rotate(2.90deg); }
+  20%  { transform: translateX(1.48vw) rotate(4.75deg); }
+  30%  { transform: translateX(1.85vw) rotate(5.93deg); }
+  40%  { transform: translateX(2.09vw) rotate(6.68deg); }
+  50%  { transform: translateX(2.24vw) rotate(7.16deg); }
+  60%  { transform: translateX(2.33vw) rotate(7.46deg); }
+  70%  { transform: translateX(2.39vw) rotate(7.66deg); }
+  80%  { transform: translateX(2.43vw) rotate(7.78deg); }
+  90%  { transform: translateX(2.46vw) rotate(7.86deg); }
+  100% { transform: translateX(2.50vw) rotate(8.00deg); }
 }
 
 @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
