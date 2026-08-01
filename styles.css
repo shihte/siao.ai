@@ -12,20 +12,19 @@
   --ink-dim: #6E6B65;
   --name-fs: clamp(4.5rem, 32vw, 22rem);
 
-  /* ---- The rigid-body geometry ----
+  /* ---- Floor Geometry ----
    *
-   * Siao sits at 50vh (Viewport 1 centre) during rest.
-   * Exits sits exactly D (85vh) ABOVE Siao's centre:
-   *   50vh - 85vh = -35vh (off-screen above during 5s hold).
+   * 1F (0vh - 100vh): Siao strike zone & rebirth
+   * B1 (100vh - 200vh): Exits (hello@siao.ai) centered at 150vh
    *
-   * When struck by the boulder, the WHOLE rigid body (.wreck) translates 185vh:
-   *   exits → -35vh + 185vh = 150vh (centre of Viewport 2, level)
-   *   Siao  →  50vh + 185vh = 235vh (lower Viewport 2, tilted)
+   * Siao starts at 50vh in 1F. When struck, wreck falls 250vh (to 300vh),
+   * passing completely through B1 into the deep abyss.
+   * overflow: hidden on .stage (200vh) clips Siao out of existence in B1.
+   * In B1, ONLY hello@siao.ai is visible. Siao is nowhere to be found in B1.
    *
-   * Distance between Email and Siao is LOCKED at 85vh. Both pushed down by single strike. */
+   * Scrolling back UP to 1F (0vh) triggers rebirth of Siao in 1F. */
   --gap: 0.58;
-  --D: 85vh;
-  --delta: 185vh;
+  --delta: 250vh;
 
   --fade-in: 0.5s;
   --hold: 5s;
@@ -50,8 +49,8 @@ body {
 
 .stage {
   position: relative;
-  height: 260vh;
-  height: 260svh;
+  height: 200vh;
+  height: 200svh;
   overflow: hidden;
 }
 
@@ -64,29 +63,16 @@ body {
   pointer-events: none;
 }
 
-/* One rigid body (.wreck).
-   Translates 185vh when struck. Never rotates (rotation is on .card). */
-.wreck {
-  position: absolute;
-  top: 50vh;
-  left: 0;
-  right: 0;
-  z-index: 1;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .wreck { transform: translateY(185vh); }
-}
-
-/* Exits sits at locked distance D (85vh) ABOVE Siao.
-   Starts at -35vh (off-screen above), falls to 150vh (Viewport 2) level. */
+/* Exits is fixed in B1 at 150vh.
+   Never visible in 1F, never tilts, never gets dragged down. */
 .exits {
   position: absolute;
-  top: calc(-1 * var(--D));
+  top: 150vh;
   left: 0;
   right: 0;
   padding: 0 7vw;
   transform: translateY(-50%);
+  z-index: 1;
 }
 
 .places { list-style: none; }
@@ -108,8 +94,18 @@ a {
   padding-bottom: 0.08em;
 }
 
-/* .card holds only Siao and statement.
-   Rotates and drifts horizontally around top-left impact point (0 0). */
+.wreck {
+  position: absolute;
+  top: 50vh;
+  left: 0;
+  right: 0;
+  z-index: 2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wreck { transform: translateY(250vh); }
+}
+
 .card {
   position: absolute;
   top: 0;
@@ -151,7 +147,7 @@ a {
   width: calc(var(--name-fs) * 0.45);
   transform: translateX(33vw);
   visibility: hidden;
-  z-index: 2;
+  z-index: 3;
 }
 
 .boulder svg {
@@ -188,18 +184,18 @@ a {
   100%  { transform: translateY(260.0vh) rotate(310deg); }
 }
 
-/* Wreck translates 185vh straight down (no rotation).
-   Email: -35vh + 185vh = 150vh (centre of Viewport 2, level)
-   Siao:   50vh + 185vh = 235vh (lower Viewport 2) */
+/* Wreck translates 250vh from 50vh down to 300vh.
+   Siao falls completely past B1 into the deep abyss (clipped by stage 200vh).
+   In B1 (100vh-200vh), ONLY hello@siao.ai is visible. Siao is gone in B1. */
 @keyframes struck {
   0%   { transform: translateY(0.00vh); }
-  10%  { transform: translateY(22.00vh); }
-  20%  { transform: translateY(48.00vh); }
-  30%  { transform: translateY(78.00vh); }
-  40%  { transform: translateY(112.00vh); }
-  50%  { transform: translateY(148.00vh); }
-  60%  { transform: translateY(185.00vh); }
-  100% { transform: translateY(185.00vh); }
+  10%  { transform: translateY(25.00vh); }
+  20%  { transform: translateY(60.00vh); }
+  30%  { transform: translateY(105.00vh); }
+  40%  { transform: translateY(155.00vh); }
+  50%  { transform: translateY(205.00vh); }
+  60%  { transform: translateY(250.00vh); }
+  100% { transform: translateY(250.00vh); }
 }
 
 @keyframes tumble {
