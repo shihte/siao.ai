@@ -15,18 +15,18 @@
   <!-- Viewport 1 trigger -->
   <div class="viewport-one" aria-hidden="true"></div>
 
-  <!-- Viewport 2 Exits: Fixed in Viewport 2.
-       Never inside wreck, never rotates, never gets dragged down. -->
-  <section class="exits" aria-label="Elsewhere">
-    <ul class="places" id="places"></ul>
-    <!-- Email lives here and nowhere else. Changing it means editing this one line. -->
-    <p class="email"><a href="mailto:hello@siao.ai">hello@siao.ai</a></p>
-  </section>
-
-  <!-- The wreck: holds Siao and statement.
-       Starts at 50vh (Viewport 1). When struck, falls 100vh to 150vh (Viewport 2),
-       landing in Viewport 2 alongside the email. -->
+  <!-- One rigid body (.wreck).
+       The exits sit at a fixed distance D (85vh) ABOVE Siao.
+       When struck, the WHOLE rigid body (Email + Siao + Statement) falls 185vh together.
+       Exits is inside .wreck (translates 185vh with Siao), but outside .card (does NOT rotate).
+       Email starts at -35vh (off-screen above during hold) and lands at 150vh (centre of Viewport 2). -->
   <div class="wreck">
+    <section class="exits" aria-label="Elsewhere">
+      <ul class="places" id="places"></ul>
+      <!-- Email lives here and nowhere else. Changing it means editing this one line. -->
+      <p class="email"><a href="mailto:hello@siao.ai">hello@siao.ai</a></p>
+    </section>
+
     <div class="card">
       <h1 class="name">Siao</h1>
       <p class="statement">The summit is a lie. The boulder is real.</p>

@@ -12,7 +12,19 @@
   --ink-dim: #6E6B65;
   --name-fs: clamp(4.5rem, 32vw, 22rem);
 
+  /* ---- The rigid-body geometry ----
+   *
+   * Siao sits at 50vh (Viewport 1 centre) during rest.
+   * Exits sits exactly D (85vh) ABOVE Siao's centre:
+   *   50vh - 85vh = -35vh (off-screen above during 5s hold).
+   *
+   * When struck by the boulder, the WHOLE rigid body (.wreck) translates 185vh:
+   *   exits → -35vh + 185vh = 150vh (centre of Viewport 2, level)
+   *   Siao  →  50vh + 185vh = 235vh (lower Viewport 2, tilted)
+   *
+   * Distance between Email and Siao is LOCKED at 85vh. Both pushed down by single strike. */
   --gap: 0.58;
+  --D: 85vh;
   --delta: 185vh;
 
   --fade-in: 0.5s;
@@ -36,9 +48,6 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Stage height 260vh allows Siao to fall completely 185vh to 235vh.
-   Viewport 1 (0-100vh): Only Siao at 50vh.
-   Viewport 2 (100-260vh): Email at 150vh, Siao lying at 235vh. */
 .stage {
   position: relative;
   height: 260vh;
@@ -55,16 +64,29 @@ body {
   pointer-events: none;
 }
 
-/* Exits is fixed in Viewport 2 at 150vh.
-   Never visible at initial load, never tilts, never gets dragged down. */
+/* One rigid body (.wreck).
+   Translates 185vh when struck. Never rotates (rotation is on .card). */
+.wreck {
+  position: absolute;
+  top: 50vh;
+  left: 0;
+  right: 0;
+  z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wreck { transform: translateY(185vh); }
+}
+
+/* Exits sits at locked distance D (85vh) ABOVE Siao.
+   Starts at -35vh (off-screen above), falls to 150vh (Viewport 2) level. */
 .exits {
   position: absolute;
-  top: 150vh;
+  top: calc(-1 * var(--D));
   left: 0;
   right: 0;
   padding: 0 7vw;
   transform: translateY(-50%);
-  z-index: 1;
 }
 
 .places { list-style: none; }
@@ -86,20 +108,8 @@ a {
   padding-bottom: 0.08em;
 }
 
-/* Wreck starts at 50vh (Viewport 1 centre).
-   When struck, falls 185vh to 235vh (bottom of Viewport 2). */
-.wreck {
-  position: absolute;
-  top: 50vh;
-  left: 0;
-  right: 0;
-  z-index: 2;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .wreck { transform: translateY(185vh); }
-}
-
+/* .card holds only Siao and statement.
+   Rotates and drifts horizontally around top-left impact point (0 0). */
 .card {
   position: absolute;
   top: 0;
@@ -141,7 +151,7 @@ a {
   width: calc(var(--name-fs) * 0.45);
   transform: translateX(33vw);
   visibility: hidden;
-  z-index: 3;
+  z-index: 2;
 }
 
 .boulder svg {
@@ -178,9 +188,9 @@ a {
   100%  { transform: translateY(260.0vh) rotate(310deg); }
 }
 
-/* Wreck drops 185vh from 50vh to 235vh.
-   Siao falls completely out of Viewport 1, landing at 235vh in Viewport 2.
-   Speed dy/dt > +120vh/s guarantees zero upward velocity at all times. */
+/* Wreck translates 185vh straight down (no rotation).
+   Email: -35vh + 185vh = 150vh (centre of Viewport 2, level)
+   Siao:   50vh + 185vh = 235vh (lower Viewport 2) */
 @keyframes struck {
   0%   { transform: translateY(0.00vh); }
   10%  { transform: translateY(22.00vh); }
