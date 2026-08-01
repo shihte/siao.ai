@@ -105,15 +105,19 @@ body {
   color: var(--ink-dim);
 }
 
-/* Exits are in Viewport 1, always horizontal, level, and clean */
 .exits {
   position: absolute;
-  top: 50vh;
+  top: 100vh;
   left: 0;
   right: 0;
   padding: 0 7vw;
   transform: translateY(-50%);
 }
+
+/* With motion, exits wait above the fold inside .wreck (-35vh).
+ * During initial 5s wait, exits are off-screen top. When struck,
+ * .wreck drops 185vh, bringing exits down into Viewport 2 (150vh). */
+html.motion .exits { top: calc(-1 * var(--D)); }
 
 .places { list-style: none; }
 
@@ -178,19 +182,19 @@ a {
   100% { transform: translateY(260.0vh) rotate(310deg); }
 }
 
-/* Impact: boulder strikes Siao & statement, pushing them down into Viewport 2 */
+/* Impact: boulder strikes Siao & statement, pushing Siao to abyss (235vh) and bringing exits to Viewport 2 (150vh) */
 @keyframes struck {
   0%   { transform: translateY(0) rotate(0deg); }
   10%  { transform: translateY(1.9vh) rotate(2deg); }
   20%  { transform: translateY(7.4vh) rotate(5deg); }
-  30%  { transform: translateY(16.7vh) rotate(8deg); }
-  40%  { transform: translateY(29.6vh) rotate(11deg); }
-  50%  { transform: translateY(46.3vh) rotate(14deg); }
-  60%  { transform: translateY(66.6vh) rotate(16deg); }
-  70%  { transform: translateY(90.7vh) rotate(17deg); }
-  80%  { transform: translateY(100vh) rotate(18deg); }
-  90%  { transform: translateY(100vh) rotate(18deg); }
-  100% { transform: translateY(100vh) rotate(18deg); }
+  30%  { transform: translateY(16.7vh) rotate(9deg); }
+  40%  { transform: translateY(29.6vh) rotate(14deg); }
+  50%  { transform: translateY(46.3vh) rotate(19deg); }
+  60%  { transform: translateY(66.6vh) rotate(24deg); }
+  70%  { transform: translateY(90.7vh) rotate(29deg); }
+  80%  { transform: translateY(118.4vh) rotate(33deg); }
+  90%  { transform: translateY(149.9vh) rotate(36deg); }
+  100% { transform: translateY(185vh) rotate(38deg); }
 }
 
 @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
