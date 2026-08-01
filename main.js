@@ -56,9 +56,11 @@ sessionStorage.setItem("seen", "1");
 let pending = null;
 let gliding = null;
 let handedOver = false;
+let visitorIntervened = false;
 
 function yield_() {
   handedOver = true;
+  visitorIntervened = true;
   clearTimeout(pending);
   pending = null;
   if (gliding !== null) cancelAnimationFrame(gliding);
@@ -79,6 +81,7 @@ function settle() {
  * of that momentum rather than into it is what makes it read as one
  * motion instead of two. */
 function glide() {
+  if (visitorIntervened) return;
   const from = window.scrollY;
   const to = window.innerHeight;
   const span = 900;
@@ -94,13 +97,14 @@ function glide() {
 }
 
 function play() {
-  yield_();
   handedOver = false;
   for (const a of document.getAnimations()) a.cancel();
   document.body.classList.remove("act");
   void document.body.offsetWidth; // reflow, so the animations restart
   document.body.classList.add("act");
-  pending = setTimeout(glide, ms("--fade-in") + ms("--hold") + ms("--impact"));
+  pending = setTimeout(() => {
+    if (!visitorIntervened) glide();
+  }, ms("--fade-in") + ms("--hold") + ms("--impact"));
 }
 
 /* Any sign of intent from the visitor and the page stops steering. */
@@ -116,37 +120,29 @@ addEventListener("keydown", (e) => { if (SCROLL_KEYS.has(e.key)) yield_(); });
 if (!stillness.matches) {
   root.classList.add("motion");
 
-  /* Forcing scrollY = 0 here guarantees the act always starts on a clean slate. */
+  /* The browser sometimes restores scroll position across refreshes within
+   * the same session. If the page reloads at scrollY > 0, viewport-one is
+   * off-screen and the IntersectionObserver never fires play(). Forcing
+   * scrollY = 0 here guarantees the act always starts on a clean slate. */
   window.scrollTo(0, 0);
 
-  /* Track scroll position to reliably restart the act whenever visitor returns to top. */
-  let atTop = true;
-  addEventListener("scroll", () => {
-    if (window.scrollY === 0) {
-      if (!atTop) {
-        atTop = true;
-        play();
-      }
-    } else if (window.scrollY > 100) {
-      atTop = false;
-    }
-  }, { passive: true });
-
+  /* Looking at the first viewport is the cue the act needs — lowering the
+   * threshold to 0.2 ensures returning visitors see Siao immediately reborn. */
   new IntersectionObserver(
     ([entry]) => {
-      if (entry.isIntersecting && window.scrollY < 50) {
-        if (!atTop) {
-          atTop = true;
-          play();
-        }
-      } else if (!entry.isIntersecting && window.scrollY > 100) {
+      if (entry.isIntersecting) play();
+      else {
         clearTimeout(pending);
-        if (handedOver) settle();
+        if (handedOver && window.scrollY > 100) settle();
       }
     },
     { threshold: 0.2 }
   ).observe(first);
 
-  /* Initial trigger on load */
-  play();
+  /* Returning near top (scrollY <= 50) automatically resets and replays the act cleanly. */
+  addEventListener("scroll", () => {
+    if (window.scrollY <= 50 && handedOver) {
+      play();
+    }
+  }, { passive: true });
 }
