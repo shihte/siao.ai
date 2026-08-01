@@ -54,45 +54,124 @@ section {
 
 /* ---- The exits ----
  *
- * Same hierarchy as the card, echoed: a quiet label standing in for the
- * name's role, a confident primary list standing in for... well, there
- * is no equivalent on the card, that's the point — this section actually
- * has somewhere to send you. Email closes it out, deliberately smaller
- * and dimmer, the same relationship the statement has to the name. */
+ * Centered editorial container echoing the card's balance. Subtle hairline
+ * dividers frame the place items with clean typography hierarchy and interactive
+ * arrow micro-feedback.
+ */
 
-.exits { align-items: flex-start; }
+.exits {
+  align-items: center;
+  justify-content: center;
+}
+
+.exits-content {
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+}
 
 .eyebrow {
-  font-size: clamp(0.72rem, 1.15vw, 0.95rem);
-  letter-spacing: 0.06em;
+  font-size: clamp(0.8rem, 1.2vw, 0.95rem);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
   color: var(--ink-dim);
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.8rem;
 }
 
-.places { list-style: none; }
+.places {
+  list-style: none;
+  border-top: 1px solid rgba(26, 26, 26, 0.14);
+  border-bottom: 1px solid rgba(26, 26, 26, 0.14);
+}
 
 .places li {
-  font-size: clamp(1.15rem, 1.8vw, 1.4rem);
-  line-height: 1.9;
+  font-size: clamp(1.4rem, 2.4vw, 1.9rem);
+  border-bottom: 1px solid rgba(26, 26, 26, 0.06);
 }
 
-.places li:not(:has(a)) { color: var(--ink-dim); }
+.places li:last-child {
+  border-bottom: none;
+}
+
+.places li a {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.1rem 0.35rem;
+  border-bottom: none;
+  color: var(--ink);
+  transition: padding-left 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.places li a::after {
+  content: "↗";
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 0.85em;
+  color: var(--ink-dim);
+  opacity: 0.35;
+  transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.places li a:hover,
+.places li a:focus-visible {
+  padding-left: 0.5rem;
+}
+
+.places li a:hover::after,
+.places li a:focus-visible::after {
+  opacity: 1;
+  color: var(--ink);
+  transform: translate(2px, -2px);
+}
+
+.places li:not(:has(a)) {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.1rem 0.35rem;
+  color: var(--ink-dim);
+  opacity: 0.45;
+}
+
+.places li:not(:has(a))::after {
+  content: "soon";
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 1px solid rgba(26, 26, 26, 0.2);
+  padding: 0.12em 0.45em;
+  border-radius: 2px;
+}
 
 .email {
-  font-size: clamp(0.85rem, 1.2vw, 1rem);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 2.5rem;
+  padding: 0.35rem;
+  font-size: clamp(1.05rem, 1.5vw, 1.25rem);
   letter-spacing: 0.02em;
+}
+
+.email::before {
+  content: "contact";
+  font-size: clamp(0.8rem, 1.2vw, 0.95rem);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
 }
 
 .email a {
   color: var(--ink-dim);
+  transition: color 0.2s ease, border-color 0.2s ease;
 }
 
 .email a:hover,
 .email a:focus-visible {
   color: var(--ink);
+  border-bottom-color: var(--ink);
 }
-
-.places:not(:empty) + .email { margin-top: 3.5rem; }
 
 a {
   color: inherit;
