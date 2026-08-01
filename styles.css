@@ -109,12 +109,16 @@ body {
  * are laid out where a reader would scroll to find them, one viewport down. */
 .exits {
   position: absolute;
-  top: 150vh;
+  top: 100vh;
   left: 0;
   right: 0;
   padding: 0 7vw;
   transform: translateY(-50%);
 }
+
+/* With motion, exits wait above the fold inside .wreck, a fixed D from the name.
+ * As the blow pushes .wreck down by 185vh, exits drops into Viewport 2 (150vh). */
+html.motion .exits { top: calc(-1 * var(--D)); }
 
 .places { list-style: none; }
 
@@ -181,27 +185,27 @@ a {
   20%  { transform: translateY(-13.6vh) rotate(58deg); }
   30%  { transform: translateY(0.7vh)   rotate(87deg); }
   40%  { transform: translateY(20.6vh)  rotate(116deg); }
-  50%  { transform: translateY(46.3vh)  rotate(145deg); }
-  60%  { transform: translateY(77.6vh)  rotate(174deg); }
-  70%  { transform: translateY(114.7vh) rotate(203deg); }
-  80%  { transform: translateY(157.4vh) rotate(232deg); }
-  90%  { transform: translateY(205.9vh) rotate(261deg); }
-  100% { transform: translateY(260.0vh) rotate(290deg); }
+  50%  { transform: translateY(46.3vh)  rotate(148deg); }
+  60%  { transform: translateY(77.6vh)  rotate(180deg); }
+  70%  { transform: translateY(114.7vh) rotate(212deg); }
+  80%  { transform: translateY(157.4vh) rotate(244deg); }
+  90%  { transform: translateY(205.9vh) rotate(276deg); }
+  100% { transform: translateY(260.0vh) rotate(310deg); }
 }
 
 /* Impact: rotational tilt & downward acceleration on the struck body */
 @keyframes struck {
   0%   { transform: translateY(0) rotate(0deg); }
-  10%  { transform: translateY(1.9vh) rotate(2deg); }
-  20%  { transform: translateY(7.4vh) rotate(5deg); }
-  30%  { transform: translateY(16.7vh) rotate(9deg); }
-  40%  { transform: translateY(29.6vh) rotate(14deg); }
-  50%  { transform: translateY(46.3vh) rotate(19deg); }
-  60%  { transform: translateY(66.6vh) rotate(24deg); }
-  70%  { transform: translateY(90.7vh) rotate(29deg); }
-  80%  { transform: translateY(118.4vh) rotate(33deg); }
-  90%  { transform: translateY(149.9vh) rotate(36deg); }
-  100% { transform: translateY(185vh) rotate(38deg); }
+  10%  { transform: translateY(1.9vh) rotate(3deg); }
+  20%  { transform: translateY(7.4vh) rotate(7deg); }
+  30%  { transform: translateY(16.7vh) rotate(12deg); }
+  40%  { transform: translateY(29.6vh) rotate(18deg); }
+  50%  { transform: translateY(46.3vh) rotate(24deg); }
+  60%  { transform: translateY(66.6vh) rotate(29deg); }
+  70%  { transform: translateY(90.7vh) rotate(33deg); }
+  80%  { transform: translateY(118.4vh) rotate(36deg); }
+  90%  { transform: translateY(149.9vh) rotate(38deg); }
+  100% { transform: translateY(185vh) rotate(40deg); }
 }
 
 @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
