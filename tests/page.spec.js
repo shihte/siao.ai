@@ -71,6 +71,10 @@ test.describe("assets", () => {
 
 test.describe("everyone can read it", () => {
   test("no accessibility violations", async ({ page }) => {
+    /* Audit the page at rest. Scanned mid-fall it reports contrast failures
+     * against a boulder that is on its way past — a real reading of a state
+     * no one is asked to read. */
+    await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
     const { violations } = await new AxeBuilder({ page }).analyze();
     expect(violations).toEqual([]);

@@ -7,7 +7,9 @@ export default defineConfig({
   retries: 0,
   reporter: process.env.CI ? "github" : "list",
   use: {
-    baseURL: "http://localhost:4173",
+    /* 127.0.0.1, not localhost: on machines that resolve localhost to ::1
+     * first, nothing answers — http.server listens on IPv4 only. */
+    baseURL: "http://127.0.0.1:4173",
     trace: "on-first-retry",
   },
   expect: {
@@ -19,8 +21,8 @@ export default defineConfig({
     { name: "desktop", use: { ...devices["Desktop Chrome"] } },
   ],
   webServer: {
-    command: "python3 -m http.server 4173",
-    url: "http://localhost:4173",
+    command: "python3 -m http.server 4173 --bind 127.0.0.1",
+    url: "http://127.0.0.1:4173",
     reuseExistingServer: !process.env.CI,
   },
 });
