@@ -11,29 +11,17 @@
 </head>
 <body>
 
-<main class="stage">
-  <!-- Nothing to see: it exists so the page can tell when you are looking at
-       the first viewport, which is the cue the whole act runs from. -->
-  <div class="viewport-one" aria-hidden="true"></div>
-
-  <!-- One body. The exits sit a fixed distance above the name and everything
-       here moves together, because it is all struck by the same blow. -->
-  <div class="wreck">
-    <section class="exits" aria-label="Elsewhere">
-      <ul class="places" id="places"></ul>
-      <!-- Email lives here and nowhere else. Changing it means editing this one line. -->
-      <p class="email"><a href="mailto:hello@siao.ai">hello@siao.ai</a></p>
-    </section>
-
+<main>
+  <section class="card">
     <h1 class="name">Siao</h1>
     <p class="statement">The summit is a lie. The boulder is real.</p>
-  </div>
+  </section>
 
-  <div class="boulder" aria-hidden="true">
-    <svg viewBox="0 0 100 100" focusable="false">
-      <path d="M95.6 56.4 83.2 72.4 64.5 94.7 40.1 89.8 20.6 82.7 11.1 52.7 8.7 29.8 23.2 20.3 46.9 5.1 65.9 14.4 85.2 20.4 89.8 40.1Z"/>
-    </svg>
-  </div>
+  <section class="exits" aria-label="Elsewhere">
+    <ul class="places" id="places"></ul>
+    <!-- Email lives here and nowhere else. Changing it means editing this one line. -->
+    <p class="email"><a href="mailto:hello@siao.ai">hello@siao.ai</a></p>
+  </section>
 </main>
 
 <script src="/main.js"></script>

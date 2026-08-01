@@ -4,7 +4,15 @@ export default defineConfig({
   testDir: "./tests",
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
-  retries: 0,
+  /* The dev server behind webServer.command is a bare python3 http.server —
+   * simple on purpose, matching the no-build-step choice for the site
+   * itself, but under a burst of near-simultaneous requests from several
+   * parallel workers it can occasionally drop one. When that happens to be
+   * styles.css, the page renders unstyled and every test in that context
+   * fails together, not with a subtle diff. One retry re-navigates against
+   * a server that's no longer under that same burst; a genuine regression
+   * fails it again. */
+  retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? "github" : "list",
   use: {
     /* 127.0.0.1, not localhost: on machines that resolve localhost to ::1
