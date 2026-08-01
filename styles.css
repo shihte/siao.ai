@@ -52,27 +52,47 @@ section {
   color: var(--ink-dim);
 }
 
-/* ---- The exits ---- */
+/* ---- The exits ----
+ *
+ * Same hierarchy as the card, echoed: a quiet label standing in for the
+ * name's role, a confident primary list standing in for... well, there
+ * is no equivalent on the card, that's the point — this section actually
+ * has somewhere to send you. Email closes it out, deliberately smaller
+ * and dimmer, the same relationship the statement has to the name. */
 
 .exits { align-items: flex-start; }
+
+.eyebrow {
+  font-size: clamp(0.72rem, 1.15vw, 0.95rem);
+  letter-spacing: 0.06em;
+  color: var(--ink-dim);
+  margin-bottom: 1.5rem;
+}
 
 .places { list-style: none; }
 
 .places li {
-  font-size: clamp(1rem, 1.6vw, 1.25rem);
-  line-height: 2;
+  font-size: clamp(1.15rem, 1.8vw, 1.4rem);
+  line-height: 1.9;
 }
 
 .places li:not(:has(a)) { color: var(--ink-dim); }
 
-/* A way to reach the owner, not another place to go — smaller than the
- * list above it, the same relationship the statement has to the name. */
 .email {
   font-size: clamp(0.85rem, 1.2vw, 1rem);
   letter-spacing: 0.02em;
 }
 
-.places:not(:empty) + .email { margin-top: 3rem; }
+.email a {
+  color: var(--ink-dim);
+}
+
+.email a:hover,
+.email a:focus-visible {
+  color: var(--ink);
+}
+
+.places:not(:empty) + .email { margin-top: 3.5rem; }
 
 a {
   color: inherit;
