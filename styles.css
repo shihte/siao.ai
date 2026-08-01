@@ -185,18 +185,21 @@ a {
   100%  { transform: translateY(260.0vh) rotate(310deg); }
 }
 
-/* Wreck drops 100vh to Viewport 2 (150vh).
- * Siao lands in Viewport 2 alongside the email.
- * Speed dy/dt > +120vh/s guarantees zero upward velocity at all times. */
+/* ---- struck: wreck linear downward translation y(t) ----
+ *
+ * Siao falls 185vh (from 50vh to 235vh), passing completely through the bottom
+ * of Viewport 2 into the abyss. Viewport 2 is left clean with only hello@siao.ai.
+ * Siao is Launched DOWNWARDS ahead of boulder (Y_siao >= Y_boulder at all times).
+ * Linear velocity dy/dt > 0 is strictly positive (downwards) at all times (+v). */
 @keyframes struck {
   0%   { transform: translateY(0.00vh); }
-  10%  { transform: translateY(18.05vh); }
-  20%  { transform: translateY(36.20vh); }
-  30%  { transform: translateY(54.45vh); }
-  40%  { transform: translateY(72.80vh); }
-  50%  { transform: translateY(91.25vh); }
-  60%  { transform: translateY(100.00vh); }
-  100% { transform: translateY(100.00vh); }
+  10%  { transform: translateY(22.00vh); }
+  20%  { transform: translateY(48.00vh); }
+  30%  { transform: translateY(78.00vh); }
+  40%  { transform: translateY(112.00vh); }
+  50%  { transform: translateY(148.00vh); }
+  60%  { transform: translateY(185.00vh); }
+  100% { transform: translateY(185.00vh); }
 }
 
 @keyframes tumble {
