@@ -18,13 +18,16 @@
    * the page is at rest.
    *
    *   --gap   how far the statement sits below the name
-   *   --D     how far the exits sit ABOVE the name. Fixed, by hand: this is
-   *           the "absolute distance" that ties the two together. Large
-   *           enough that the exits start off-screen.
-   *   --delta how far the whole body travels when it is struck. It is
-   *           100vh + D and nothing else: one viewport for the camera to
-   *           descend, plus the D that brings the exits down to where the
-   *           camera will be looking. Change D and this follows. */
+   *   --D     how far the exits sit ABOVE the name's centre. Large enough
+   *           that exits start off-screen above during the 5s hold.
+   *   --delta how far the whole body travels when struck:
+   *           100vh (camera descends one viewport) + D (brings exits down
+   *           to the camera's new position). Change D and this follows.
+   *
+   * After the blow:
+   *   exits  →  -35vh + 185vh  = 150vh  (centre of Viewport 2)
+   *   Siao   →   50vh + 185vh  = 235vh  (within Viewport 3)
+   *   Stage must be 300vh so Siao is not clipped by overflow:hidden. */
   --gap: 0.58;   /* as a multiple of the name's size, so it scales with it */
   --D: 85vh;
   --delta: 185vh;
@@ -54,12 +57,15 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Two viewports to scroll through; anything that falls out is clipped rather
- * than dragging the scrollbar along with it. */
+/* Three viewports to scroll through.
+ * Viewport 1: strike zone (Siao, pre-impact)
+ * Viewport 2: where the exits land (150vh) after the blow
+ * Viewport 3: where Siao lands (235vh) after tumbling down
+ * overflow:hidden clips nothing at 300vh, so all three are reachable. */
 .stage {
   position: relative;
-  height: 200vh;
-  height: 200svh;
+  height: 300vh;
+  height: 300svh;
   overflow: hidden;
 }
 
@@ -73,10 +79,29 @@ body {
 }
 
 /* The origin of this element is the name's centre. Everything inside is
- * placed relative to that, so the distances between them are constants. */
+ * placed relative to that, so the distances between them are constants.
+ * The wreck ONLY translates — it never rotates. Rotation belongs to .card. */
 .wreck {
   position: absolute;
   top: 50vh;
+  left: 0;
+  right: 0;
+  /* Sits behind the boulder so the rock visually strikes from the front. */
+  z-index: 1;
+}
+
+/* Reduced-motion: no animation runs, so wreck never moves on its own.
+ * Jump it straight to the settled position so exits at 150vh and Siao at
+ * 235vh are reachable by scrolling. */
+@media (prefers-reduced-motion: reduce) {
+  .wreck { transform: translateY(185vh); }
+}
+
+/* .card holds only the name and statement. It sits at the wreck's origin
+ * and is the only element that rotates — exits is a sibling, untouched. */
+.card {
+  position: absolute;
+  top: 0;
   left: 0;
   right: 0;
 }
@@ -107,17 +132,15 @@ body {
 
 .exits {
   position: absolute;
-  top: 100vh;
+  /* Sits exactly D above the name's centre (which is at wreck top = 0).
+   * With D = 85vh, exits is at 50vh - 85vh = -35vh from stage top while
+   * the wreck is at rest: off-screen above, invisible during the hold. */
+  top: calc(-1 * var(--D));
   left: 0;
   right: 0;
   padding: 0 7vw;
   transform: translateY(-50%);
 }
-
-/* With motion, exits wait above the fold inside .wreck (-35vh).
- * During initial 5s wait, exits are off-screen top. When struck,
- * .wreck drops 185vh, bringing exits down into Viewport 2 (150vh). */
-html.motion .exits { top: calc(-1 * var(--D)); }
 
 .places { list-style: none; }
 
@@ -147,6 +170,9 @@ a {
   width: calc(var(--name-fs) * 0.45);
   transform: translateX(33vw);
   visibility: hidden;
+  /* The rock must be in front of Siao so the collision is visible.
+   * z-index 2 puts it above the wreck (z-index 1). */
+  z-index: 2;
 }
 
 .boulder svg {
@@ -168,33 +194,61 @@ a {
   to   { transform: translateX(56vw); }
 }
 
+/* t² free-fall from -25vh to 260vh (285vh span in 2 s).
+ * Around 51.3% (the impact moment) the boulder briefly decelerates —
+ * as if something pushed back — then resumes and accelerates away.
+ * This is what makes the collision feel physical rather than coincidental. */
 @keyframes boulder-y {
-  0%   { transform: translateY(-25.0vh) rotate(0deg); }
-  10%  { transform: translateY(-22.2vh) rotate(29deg); }
-  20%  { transform: translateY(-13.6vh) rotate(58deg); }
-  30%  { transform: translateY(0.7vh)   rotate(87deg); }
-  40%  { transform: translateY(20.6vh)  rotate(116deg); }
-  50%  { transform: translateY(46.3vh)  rotate(148deg); }
-  60%  { transform: translateY(77.6vh)  rotate(180deg); }
-  70%  { transform: translateY(114.7vh) rotate(212deg); }
-  80%  { transform: translateY(157.4vh) rotate(244deg); }
-  90%  { transform: translateY(205.9vh) rotate(276deg); }
-  100% { transform: translateY(260.0vh) rotate(310deg); }
+  0%    { transform: translateY(-25.0vh) rotate(0deg); }
+  10%   { transform: translateY(-22.2vh) rotate(29deg); }
+  20%   { transform: translateY(-13.6vh) rotate(58deg); }
+  30%   { transform: translateY(0.7vh)   rotate(87deg); }
+  40%   { transform: translateY(20.6vh)  rotate(116deg); }
+  /* Approaching Siao at speed */
+  48%   { transform: translateY(41.8vh)  rotate(141deg); }
+  /* IMPACT — boulder sticks for one beat, Siao pushes back */
+  51.3% { transform: translateY(50.0vh)  rotate(148deg); }
+  53%   { transform: translateY(51.8vh)  rotate(151deg); }
+  /* Momentum wins; boulder punches through and accelerates */
+  58%   { transform: translateY(68.2vh)  rotate(163deg); }
+  70%   { transform: translateY(114.7vh) rotate(212deg); }
+  80%   { transform: translateY(157.4vh) rotate(244deg); }
+  90%   { transform: translateY(205.9vh) rotate(276deg); }
+  100%  { transform: translateY(260.0vh) rotate(310deg); }
 }
 
-/* Impact: boulder strikes Siao & statement, pushing Siao to abyss (235vh) and bringing exits to Viewport 2 (150vh) */
+/* ---- struck: wreck translates straight down, no rotation ----
+ *
+ * Rotation is the card's job (see @keyframes tumble).
+ * Keeping the two transforms separate means exits inherits the translation
+ * but never the spin: it arrives at 150vh perfectly level. */
 @keyframes struck {
-  0%   { transform: translateY(0) rotate(0deg); }
-  10%  { transform: translateY(1.9vh) rotate(2deg); }
-  20%  { transform: translateY(7.4vh) rotate(5deg); }
-  30%  { transform: translateY(16.7vh) rotate(9deg); }
-  40%  { transform: translateY(29.6vh) rotate(14deg); }
-  50%  { transform: translateY(46.3vh) rotate(19deg); }
-  60%  { transform: translateY(66.6vh) rotate(24deg); }
-  70%  { transform: translateY(90.7vh) rotate(29deg); }
-  80%  { transform: translateY(118.4vh) rotate(33deg); }
-  90%  { transform: translateY(149.9vh) rotate(36deg); }
-  100% { transform: translateY(185vh) rotate(38deg); }
+  0%   { transform: translateY(0); }
+  10%  { transform: translateY(1.9vh); }
+  20%  { transform: translateY(7.4vh); }
+  30%  { transform: translateY(16.7vh); }
+  40%  { transform: translateY(29.6vh); }
+  50%  { transform: translateY(46.3vh); }
+  60%  { transform: translateY(66.6vh); }
+  70%  { transform: translateY(90.7vh); }
+  80%  { transform: translateY(118.4vh); }
+  90%  { transform: translateY(149.9vh); }
+  100% { transform: translateY(185vh); }
+}
+
+/* ---- tumble: the card (Siao + statement) spins on impact ----
+ *
+ * Fast initial angular acceleration — the boulder's angular momentum
+ * transfers instantly — then the spin decelerates as air resistance wins.
+ * ease-out on the animation curve alone isn't enough; the keyframe
+ * distribution does the heavy lifting. */
+@keyframes tumble {
+  0%   { transform: rotate(0deg); }
+  12%  { transform: rotate(15deg); }
+  28%  { transform: rotate(28deg); }
+  50%  { transform: rotate(34deg); }
+  75%  { transform: rotate(37deg); }
+  100% { transform: rotate(38deg); }
 }
 
 @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
@@ -204,14 +258,20 @@ a {
 
 :root { --strike: calc(var(--fade-in) + var(--hold)); }
 
+/* Siao and statement fade in at the very top of the act. */
 body.act .name,
-body.act .statement,
-body.act .exits {
+body.act .statement {
   animation: fade-in var(--fade-in) ease-out both;
 }
 
+/* The entire wreck descends at impact — exits travels with it, level. */
 body.act .wreck {
   animation: struck var(--drop) linear calc(var(--strike) + var(--impact)) both;
+}
+
+/* Only the card rotates: exits is a sibling of .card, so it is spared. */
+body.act .card {
+  animation: tumble var(--drop) ease-out calc(var(--strike) + var(--impact)) both;
 }
 
 body.act .boulder {

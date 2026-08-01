@@ -49,10 +49,9 @@ test.describe("who is steering", () => {
     expect(y).toBe(viewport);
   });
 
-  /* The exits are carried into place by the fall rather than laid out where
-   * they end up, so anyone who arrives ahead of the fall arrives at nothing.
-   * Going looking has to be answered immediately, or the only way to make
-   * contact is invisible for several seconds. */
+  /* settle() finishes all animations instantly — the wreck drops 185vh,
+   * placing exits at 150vh (centre of Viewport 2). Scrolling to innerHeight
+   * brings the visitor to Viewport 2, where exits is right in front of them. */
   test("going looking early still finds the exits", async ({ page }) => {
     await page.goto("/");
     await page.mouse.wheel(0, 1); // the visitor takes the wheel
