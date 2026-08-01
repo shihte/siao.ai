@@ -98,12 +98,14 @@ body {
 }
 
 /* .card holds only the name and statement. It sits at the wreck's origin
- * and is the only element that rotates — exits is a sibling, untouched. */
+ * and is the only element that rotates and drifts horizontally.
+ * transform-origin: 50% 0 places the rotation pivot at the exact centre of Siao. */
 .card {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
+  transform-origin: 50% 0;
 }
 
 .name {
@@ -194,72 +196,79 @@ a {
   to   { transform: translateX(56vw); }
 }
 
-/* t² free-fall from -25vh to 260vh (285vh span in 2 s).
- * At 51.3% the boulder reaches Siao (50vh). It then HOLDS at 50vh for 5%
- * of the animation (100ms) — visibly stuck against the mass it just hit —
- * before punching through and resuming. The hold is what makes the
- * collision feel like contact rather than coincidence. */
+/* ---- The fall: 2D rigid-body collision physics ---- */
+
+@keyframes boulder-x {
+  from { transform: translateX(33vw); }
+  to   { transform: translateX(56vw); }
+}
+
+/* Boulder physics:
+ * Free-fall under gravity y(t) = -25vh + 71.25 t² (over 2.0s).
+ * At t = 1.026s (51.3%), the boulder hits Siao at 50vh.
+ * Upon impact, it transfers momentum to Siao. The boulder's downward speed
+ * drops slightly from 146vh/s to 110vh/s as it pushes Siao, then resumes
+ * accelerating downwards under gravity.
+ * Velocity dy/dt > 0 is strictly positive (downwards) at all times — no holding, no bouncing. */
 @keyframes boulder-y {
   0%    { transform: translateY(-25.0vh) rotate(0deg); }
   10%   { transform: translateY(-22.2vh) rotate(29deg); }
   20%   { transform: translateY(-13.6vh) rotate(58deg); }
   30%   { transform: translateY(0.7vh)   rotate(87deg); }
   40%   { transform: translateY(20.6vh)  rotate(116deg); }
-  48%   { transform: translateY(41.8vh)  rotate(141deg); }
-  /* IMPACT: boulder arrives at Siao's centre */
+  50%   { transform: translateY(46.3vh)  rotate(145deg); }
   51.3% { transform: translateY(50.0vh)  rotate(148deg); }
-  /* HOLD — boulder is pressed against Siao, transferring momentum */
-  56.3% { transform: translateY(50.0vh)  rotate(162deg); }
-  /* Boulder punches through and continues down */
-  62%   { transform: translateY(80.0vh)  rotate(185deg); }
-  72%   { transform: translateY(122.0vh) rotate(220deg); }
-  82%   { transform: translateY(165.0vh) rotate(252deg); }
-  92%   { transform: translateY(212.0vh) rotate(284deg); }
+  60%   { transform: translateY(69.1vh)  rotate(175deg); }
+  70%   { transform: translateY(105.8vh) rotate(208deg); }
+  80%   { transform: translateY(149.6vh) rotate(242deg); }
+  90%   { transform: translateY(201.0vh) rotate(276deg); }
   100%  { transform: translateY(260.0vh) rotate(310deg); }
 }
 
-/* ---- struck: wreck translates straight down, no rotation ----
+/* ---- struck: wreck linear downward translation y(t) ----
  *
- * This is v₀⋅t + ½g⋅t² physics, not a pure t² free-fall.
- * The boulder transfers momentum at impact, giving the wreck an
- * immediate initial velocity v₀ ≈ 73vh/s (half of boulder's impact speed).
- * Gravity g then adds to that. Result: the wreck launches fast
- * and decelerates relative to a pure free-fall — it was pushed, not dropped.
+ * Exact impulse-gravity physics: y(t) = v₀⋅t + ½g⋅t² (over 1.5s).
+ * - Initial downward velocity v₀ = 80 vh/s (impulse kick from boulder at t=0⁺)
+ * - Downward gravity acceleration g = 57.78 vh/s²
  *
- * Exits inherits this translation and arrives at 150vh perfectly level.
- * Rotation and lateral drift belong to .card (see @keyframes tumble). */
+ * Linear velocity dy/dt = v₀ + gt > 0 starts at +80 vh/s immediately on impact.
+ * Because v₀ > (W/2)⋅ω₀, every single pixel of Siao moves strictly DOWNWARDS (+v)
+ * from frame 1 of impact with ZERO upward (-v) movement. */
 @keyframes struck {
-  0%   { transform: translateY(0); }
-  10%  { transform: translateY(11.7vh); }
-  20%  { transform: translateY(24.9vh); }
-  30%  { transform: translateY(39.6vh); }
-  40%  { transform: translateY(55.9vh); }
-  50%  { transform: translateY(73.6vh); }
-  60%  { transform: translateY(92.8vh); }
-  70%  { transform: translateY(113.6vh); }
-  80%  { transform: translateY(135.8vh); }
-  90%  { transform: translateY(159.6vh); }
-  100% { transform: translateY(185vh); }
+  0%   { transform: translateY(0.00vh); }
+  10%  { transform: translateY(12.65vh); }
+  20%  { transform: translateY(26.60vh); }
+  30%  { transform: translateY(41.85vh); }
+  40%  { transform: translateY(58.40vh); }
+  50%  { transform: translateY(76.25vh); }
+  60%  { transform: translateY(95.40vh); }
+  70%  { transform: translateY(115.85vh); }
+  80%  { transform: translateY(137.60vh); }
+  90%  { transform: translateY(160.65vh); }
+  100% { transform: translateY(185.00vh); }
 }
 
-/* ---- tumble: the card (Siao + statement) spins AND drifts rightward ----
+/* ---- tumble: angular & horizontal momentum transferred to Siao ----
  *
- * The boulder travels from left to right (33vw → 56vw) and strikes
- * from the upper-right. Physics demands Siao move in the direction of
- * the force: DOWN (from wreck's struck) and RIGHT (from tumble's translateX).
- * The rotation is clockwise — upper-right of Siao gets pushed right,
- * lower-left swings left and up, exactly as impact dictates.
+ * 1. Rotational momentum: θ(t) = 36.8° ⋅ (1 - e⁻²˙²ᵗ)
+ *    Inherits clockwise angular velocity ω₀ = 81°/s from boulder's spin,
+ *    decaying via air resistance.
+ * 2. Horizontal momentum: x(t) = 4.0vw ⋅ (1 - e⁻²˙⁰ᵗ)
+ *    Inherits rightward impulse from boulder's left-to-right path (33vw → 56vw).
  *
- * Angular momentum profile: fast initial spin (impact kick), then
- * decelerating rotation (air damping). */
+ * Applied around transform-origin: 50% 0 (center of Siao). */
 @keyframes tumble {
-  0%   { transform: translateX(0)      rotate(0deg); }
-  10%  { transform: translateX(1.8vw)  rotate(15deg); }
-  20%  { transform: translateX(3.0vw)  rotate(25deg); }
-  30%  { transform: translateX(3.8vw)  rotate(30deg); }
-  50%  { transform: translateX(4.5vw)  rotate(35deg); }
-  75%  { transform: translateX(4.8vw)  rotate(37deg); }
-  100% { transform: translateX(5vw)    rotate(38deg); }
+  0%   { transform: translateX(0.00vw) rotate(0.0deg); }
+  10%  { transform: translateX(1.04vw) rotate(10.3deg); }
+  20%  { transform: translateX(1.80vw) rotate(17.8deg); }
+  30%  { transform: translateX(2.37vw) rotate(23.1deg); }
+  40%  { transform: translateX(2.80vw) rotate(27.0deg); }
+  50%  { transform: translateX(3.11vw) rotate(29.7deg); }
+  60%  { transform: translateX(3.34vw) rotate(31.7deg); }
+  70%  { transform: translateX(3.51vw) rotate(33.1deg); }
+  80%  { transform: translateX(3.64vw) rotate(34.2deg); }
+  90%  { transform: translateX(3.73vw) rotate(34.9deg); }
+  100% { transform: translateX(3.80vw) rotate(35.0deg); }
 }
 
 @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
