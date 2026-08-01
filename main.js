@@ -14,7 +14,7 @@ history.scrollRestoration = "manual";
  */
 const PLACES = [
   { name: "git.siao.ai", url: "https://git.siao.ai", desc: "code & repositories", live: true },
-  { name: "app.siao.ai", url: "https://app.siao.ai", desc: "web applications & tools", live: true },
+  { name: "apps.siao.ai", url: "https://apps.siao.ai", desc: "web applications & tools", live: true },
 ];
 
 const list = document.getElementById("places");

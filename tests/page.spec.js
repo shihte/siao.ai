@@ -27,7 +27,7 @@ test.describe("what the visitor gets", () => {
     const links = page.locator(".places li a");
     await expect(links).toHaveCount(2);
     await expect(links.nth(0)).toHaveAttribute("href", "https://git.siao.ai");
-    await expect(links.nth(1)).toHaveAttribute("href", "https://app.siao.ai");
+    await expect(links.nth(1)).toHaveAttribute("href", "https://apps.siao.ai");
   });
 
   test("the page is titled and described", async ({ page }) => {
