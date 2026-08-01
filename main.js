@@ -95,6 +95,8 @@ addEventListener("pointerdown", yield_, { passive: true });
 addEventListener("keydown", (e) => { if (SCROLL_KEYS.has(e.key)) yield_(); });
 
 if (!stillness.matches) {
+  root.classList.add("motion");
+
   /* The card coming into view is the only cue the act needs — it covers
    * the first visit and every return alike. */
   new IntersectionObserver(
@@ -104,4 +106,15 @@ if (!stillness.matches) {
     },
     { threshold: 0.95 }
   ).observe(card);
+
+  /* Scene two lands as it is reached, top line first. */
+  const landing = [...list.children, document.querySelector(".email")];
+  landing.forEach((el, i) => el.style.setProperty("--i", i));
+
+  new IntersectionObserver(
+    ([entry]) => {
+      document.body.classList.toggle("landed", entry.isIntersecting);
+    },
+    { threshold: 0.4 }
+  ).observe(exits);
 }

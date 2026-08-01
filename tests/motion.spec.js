@@ -52,6 +52,17 @@ test.describe("who is steering", () => {
     expect(y).toBe(exits);
   });
 
+  /* Scene two starts invisible so it can land. If whatever reveals it ever
+   * breaks, the email is gone for good and nothing else would notice. */
+  test("the exits are actually legible once you arrive", async ({ page }) => {
+    await page.goto("/");
+    await page.locator(".exits").scrollIntoViewIfNeeded();
+    await expect(page.locator(".email a")).toBeVisible();
+    await expect
+      .poll(() => page.locator(".email").evaluate((e) => getComputedStyle(e).opacity))
+      .toBe("1");
+  });
+
   test("one flick of the wheel and it stops steering", async ({ page }) => {
     await page.goto("/");
     await page.waitForTimeout(800);
