@@ -1,0 +1,186 @@
+@font-face {
+  font-family: "EB Garamond";
+  src: url("/fonts/eb-garamond-latin.woff2") format("woff2");
+  font-weight: 400 500;
+  font-style: normal;
+  font-display: block; /* block, not swap: a flash of the wrong serif is worse than a moment of nothing */
+}
+
+:root {
+  --paper: #FAF9F6;
+  --ink: #1A1A1A;
+  --ink-dim: #6E6B65;
+  --name-fs: clamp(4.5rem, 32vw, 22rem);
+
+  /* The choreography. Numbers here are the whole design; nothing else knows them. */
+  --fade-in: 0.5s;
+  --hold: 5s;
+  --fall: 1.5s;      /* boulder: off-screen top to off-screen bottom */
+  --impact: 1.06s;   /* when it reaches the name — sqrt(0.5) of the fall, see keyframes */
+
+  color-scheme: only light; /* the colours are the design, not a preference */
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "EB Garamond", Georgia, serif;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+section {
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 8vmin 7vw;
+}
+
+/* ---- Scene one: the card ---- */
+
+.card {
+  align-items: center;
+  text-align: center;
+  position: relative;
+  overflow: hidden; /* the bottom edge is the far side — things leave through it */
+}
+
+.name {
+  font-size: var(--name-fs);
+  font-weight: 400;
+  line-height: 0.9;
+  letter-spacing: -0.02em;
+}
+
+.statement {
+  margin-top: clamp(1.5rem, 4vmin, 3rem);
+  font-size: clamp(0.72rem, 1.15vw, 0.95rem);
+  letter-spacing: 0.06em;
+  color: var(--ink-dim);
+}
+
+.boulder {
+  position: absolute;
+  /* Offset by half its own size so translate() addresses the boulder's centre,
+   * not its top-left corner — otherwise it "lands" a whole radius too low. */
+  top: calc(var(--name-fs) * -0.225);
+  left: calc(var(--name-fs) * -0.225);
+  width: calc(var(--name-fs) * 0.45); /* ~65% of the name's cap height */
+  transform: translateX(33vw);
+  visibility: hidden;
+}
+
+.boulder svg { display: block; width: 100%; height: auto; fill: var(--ink); }
+
+.boulder svg { transform: translateY(-25vh); }
+
+/* ---- The fall ----
+ *
+ * Position under constant acceleration goes as t², so the vertical keyframes
+ * below are a parabola sampled every 10% and played back linearly. Easing
+ * curves only approximate this; the explicit samples are exact.
+ *
+ * The boulder travels -25vh → 125vh. It meets the name at 50vh, which is
+ * halfway, which under t² is at sqrt(0.5) = 70.7% of the fall — hence
+ * --impact = 1.06s of a 1.5s fall. Change one and you must change the other.
+ */
+
+@keyframes boulder-x {
+  from { transform: translateX(33vw); }
+  to   { transform: translateX(52vw); }
+}
+
+@keyframes boulder-y {
+  0%   { transform: translateY(-25.0vh) rotate(0deg); }
+  10%  { transform: translateY(-23.5vh) rotate(22deg); }
+  20%  { transform: translateY(-19.0vh) rotate(44deg); }
+  30%  { transform: translateY(-11.5vh) rotate(66deg); }
+  40%  { transform: translateY(-1.0vh)  rotate(88deg); }
+  50%  { transform: translateY(12.5vh)  rotate(110deg); }
+  60%  { transform: translateY(29.0vh)  rotate(132deg); }
+  70%  { transform: translateY(48.5vh)  rotate(154deg); }
+  80%  { transform: translateY(71.0vh)  rotate(176deg); }
+  90%  { transform: translateY(96.5vh)  rotate(198deg); }
+  100% { transform: translateY(125.0vh) rotate(220deg); }
+}
+
+/* Struck from above: the name leaves with the velocity the blow gave it and
+ * then accelerates — it does not start from rest, it starts from being hit. */
+@keyframes name-struck {
+  0%   { transform: translate(0, 0) rotate(0deg); }
+  20%  { transform: translate(0.7vw, 9vh) rotate(4deg); }
+  40%  { transform: translate(1.8vw, 24vh) rotate(10deg); }
+  60%  { transform: translate(3.4vw, 47vh) rotate(18deg); }
+  80%  { transform: translate(5.5vw, 76vh) rotate(27deg); }
+  100% { transform: translate(8vw, 112vh) rotate(38deg); }
+}
+
+@keyframes fade-in  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fade-out { to { opacity: 0; } }
+
+/* One class drives the whole act, so restarting it is: remove, reflow, add.
+ * Every delay below is measured from that single moment. */
+
+:root { --strike: calc(var(--fade-in) + var(--hold)); }
+
+body.act .name {
+  animation:
+    fade-in var(--fade-in) ease-out both,
+    name-struck 0.85s linear calc(var(--strike) + var(--impact)) both;
+}
+
+body.act .statement {
+  animation:
+    fade-in var(--fade-in) ease-out both,
+    fade-out 0.3s ease-in calc(var(--strike) + var(--impact)) both;
+}
+
+body.act .boulder {
+  visibility: visible;
+  animation: boulder-x var(--fall) linear var(--strike) both;
+}
+
+body.act .boulder svg {
+  animation: boulder-y var(--fall) linear var(--strike) both;
+}
+
+/* Stillness is a valid way to see this page, not a degraded one: nothing is
+ * animated unless .act is added, and it never is for these visitors. */
+@media (prefers-reduced-motion: reduce) {
+  .boulder { display: none; }
+}
+
+/* ---- Scene two: the exits ---- */
+
+.exits { align-items: flex-start; }
+
+.places { list-style: none; }
+
+.places li {
+  font-size: clamp(1rem, 1.6vw, 1.25rem);
+  line-height: 2;
+}
+
+.places li:not(:has(a)) { color: var(--ink-dim); }
+
+.email {
+  font-size: clamp(1rem, 1.6vw, 1.25rem);
+  line-height: 2;
+}
+
+.places:empty + .email { margin-top: 0; }
+.places:not(:empty) + .email { margin-top: 2.5rem; }
+
+a {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
+  padding-bottom: 0.08em;
+}
