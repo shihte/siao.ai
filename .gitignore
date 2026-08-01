@@ -6,3 +6,4 @@ playwright-report/
 # Planning lives in the self-hosted repo, not here
 SPEC.md
 .scratch/
+.claude/
