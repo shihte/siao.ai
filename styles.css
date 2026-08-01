@@ -14,17 +14,15 @@
 
   /* ---- Floor Geometry ----
    *
-   * 1F (0vh - 100vh): Siao strike zone & rebirth
-   * B1 (100vh - 200vh): Exits (hello@siao.ai) centered at 150vh
+   * 1F (0vh - 100vh): Siao strike zone & rebirth (50vh)
+   * B1 (100vh - 200vh): Exits & Fallen Siao (150vh)
    *
-   * Siao starts at 50vh in 1F. When struck, wreck falls 250vh (to 300vh),
-   * passing completely through B1 into the deep abyss.
-   * overflow: hidden on .stage (200vh) clips Siao out of existence in B1.
-   * In B1, ONLY hello@siao.ai is visible. Siao is nowhere to be found in B1.
-   *
-   * Scrolling back UP to 1F (0vh) triggers rebirth of Siao in 1F. */
+   * 1F initial load: Only Siao at 50vh. Exits is in B1 (150vh, hidden off-screen).
+   * When struck: Siao falls 100vh from 50vh to 150vh (landing in B1!).
+   * Going to B1 (scroll to 100vh): Visitor finds Siao lying in B1 alongside Email.
+   * Returning to 1F (scroll to 0vh): Siao is reborn in 1F at 50vh. */
   --gap: 0.58;
-  --delta: 250vh;
+  --delta: 100vh;
 
   --fade-in: 0.5s;
   --hold: 5s;
@@ -94,6 +92,8 @@ a {
   padding-bottom: 0.08em;
 }
 
+/* Wreck starts at 50vh in 1F.
+   When struck, falls 100vh to 150vh (landing in B1!). */
 .wreck {
   position: absolute;
   top: 50vh;
@@ -103,7 +103,7 @@ a {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .wreck { transform: translateY(250vh); }
+  .wreck { transform: translateY(100vh); }
 }
 
 .card {
@@ -184,18 +184,18 @@ a {
   100%  { transform: translateY(260.0vh) rotate(310deg); }
 }
 
-/* Wreck translates 250vh from 50vh down to 300vh.
-   Siao falls completely past B1 into the deep abyss (clipped by stage 200vh).
-   In B1 (100vh-200vh), ONLY hello@siao.ai is visible. Siao is gone in B1. */
+/* Wreck translates 100vh from 50vh down to 150vh (landing in B1!).
+   In B1 (100vh-200vh), BOTH Siao and Email are present in B1.
+   Speed dy/dt > +120vh/s guarantees zero upward velocity at all times. */
 @keyframes struck {
   0%   { transform: translateY(0.00vh); }
-  10%  { transform: translateY(25.00vh); }
-  20%  { transform: translateY(60.00vh); }
-  30%  { transform: translateY(105.00vh); }
-  40%  { transform: translateY(155.00vh); }
-  50%  { transform: translateY(205.00vh); }
-  60%  { transform: translateY(250.00vh); }
-  100% { transform: translateY(250.00vh); }
+  10%  { transform: translateY(18.05vh); }
+  20%  { transform: translateY(36.20vh); }
+  30%  { transform: translateY(54.45vh); }
+  40%  { transform: translateY(72.80vh); }
+  50%  { transform: translateY(91.25vh); }
+  60%  { transform: translateY(100.00vh); }
+  100% { transform: translateY(100.00vh); }
 }
 
 @keyframes tumble {
