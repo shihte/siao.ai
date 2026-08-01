@@ -86,7 +86,6 @@ section {
 }
 
 .places li {
-  font-size: clamp(1.4rem, 2.4vw, 1.9rem);
   border-bottom: 1px solid rgba(26, 26, 26, 0.06);
 }
 
@@ -102,6 +101,26 @@ section {
   border-bottom: none;
   color: var(--ink);
   transition: padding-left 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.place-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.place-name {
+  color: var(--ink);
+  font-size: clamp(1.35rem, 2.2vw, 1.85rem);
+  line-height: 1.1;
+}
+
+.place-desc {
+  font-size: clamp(0.82rem, 1.15vw, 0.95rem);
+  color: var(--ink-dim);
+  font-style: italic;
+  letter-spacing: 0.03em;
+  font-weight: 400;
 }
 
 .places li a::after {

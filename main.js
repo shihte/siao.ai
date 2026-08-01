@@ -13,8 +13,8 @@ history.scrollRestoration = "manual";
  * isn't up yet can't send anyone to a 404.
  */
 const PLACES = [
-  { name: "git.siao.ai", url: "https://git.siao.ai", live: true },
-  { name: "app.siao.ai", url: "https://app.siao.ai", live: true },
+  { name: "git.siao.ai", url: "https://git.siao.ai", desc: "code & repositories", live: true },
+  { name: "app.siao.ai", url: "https://app.siao.ai", desc: "web applications & tools", live: true },
 ];
 
 const list = document.getElementById("places");
@@ -24,10 +24,41 @@ for (const place of PLACES) {
   if (place.live) {
     const a = document.createElement("a");
     a.href = place.url;
-    a.textContent = place.name;
+
+    const info = document.createElement("span");
+    info.className = "place-info";
+
+    const name = document.createElement("span");
+    name.className = "place-name";
+    name.textContent = place.name;
+    info.append(name);
+
+    if (place.desc) {
+      const desc = document.createElement("span");
+      desc.className = "place-desc";
+      desc.textContent = place.desc;
+      info.append(desc);
+    }
+
+    a.append(info);
     li.append(a);
   } else {
-    li.textContent = place.name;
+    const info = document.createElement("span");
+    info.className = "place-info";
+
+    const name = document.createElement("span");
+    name.className = "place-name";
+    name.textContent = place.name;
+    info.append(name);
+
+    if (place.desc) {
+      const desc = document.createElement("span");
+      desc.className = "place-desc";
+      desc.textContent = place.desc;
+      info.append(desc);
+    }
+
+    li.append(info);
   }
   list.append(li);
 }
