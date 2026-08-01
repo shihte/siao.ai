@@ -57,6 +57,7 @@ test.describe("who is steering", () => {
     await page.goto("/");
     await expect(page.locator(".email a")).toBeInViewport();
     await expect(page.locator(".email a")).toHaveText("hello@siao.ai");
+    await page.mouse.wheel(0, 1);
     await page.evaluate(() => window.scrollTo(0, window.innerHeight));
     await expect(page.locator("h1")).toBeInViewport();
   });
