@@ -16,7 +16,14 @@
   --fade-in: 0.5s;
   --hold: 5s;
   --fall: 1.5s;      /* boulder: off-screen top to off-screen bottom */
-  --impact: 1.06s;   /* when it reaches the name — sqrt(0.5) of the fall, see keyframes */
+
+  /* Two impacts, not one. The boulder passes through the name and then
+   * through the line beneath it, and both are hit for real. Each time is
+   * read off the parabola at that element's measured height: the name sits
+   * at ~47vh, the statement at ~70vh. Move either element and these must
+   * be re-derived, not nudged. */
+  --impact: 1.04s;
+  --impact-2: 1.19s;
 
   color-scheme: only light; /* the colours are the design, not a preference */
 }
@@ -122,8 +129,29 @@ section {
   100% { transform: translate(8vw, 112vh) rotate(38deg); }
 }
 
-@keyframes fade-in  { from { opacity: 0; } to { opacity: 1; } }
-@keyframes fade-out { to { opacity: 0; } }
+/* The line is smaller and lighter than the name, so the same blow throws it
+ * further and spins it harder. */
+@keyframes statement-struck {
+  0%   { transform: translate(0, 0) rotate(0deg); }
+  20%  { transform: translate(1.4vw, 11vh) rotate(7deg); }
+  40%  { transform: translate(3.2vw, 28vh) rotate(17deg); }
+  60%  { transform: translate(5.6vw, 52vh) rotate(30deg); }
+  80%  { transform: translate(8.4vw, 82vh) rotate(46deg); }
+  100% { transform: translate(12vw, 120vh) rotate(64deg); }
+}
+
+/* Scene two is where the wreckage lands: everything arrives from above
+ * under the same gravity, one after another. */
+@keyframes land {
+  0%   { opacity: 0; transform: translateY(-40vh) rotate(-7deg); }
+  15%  { opacity: 1; }
+  25%  { transform: translateY(-37.5vh) rotate(-5.2deg); }
+  50%  { transform: translateY(-30vh) rotate(-3.5deg); }
+  75%  { transform: translateY(-17.5vh) rotate(-1.7deg); }
+  100% { opacity: 1; transform: none; }
+}
+
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
 
 /* One class drives the whole act, so restarting it is: remove, reflow, add.
  * Every delay below is measured from that single moment. */
@@ -139,7 +167,17 @@ body.act .name {
 body.act .statement {
   animation:
     fade-in var(--fade-in) ease-out both,
-    fade-out 0.3s ease-in calc(var(--strike) + var(--impact)) both;
+    statement-struck 0.8s linear calc(var(--strike) + var(--impact-2)) both;
+}
+
+/* Hidden only when there is motion to hide it for. Without JS, or with
+ * motion turned off, scene two is simply there. */
+html.motion .places li,
+html.motion .email { opacity: 0; }
+
+html.motion body.landed .places li,
+html.motion body.landed .email {
+  animation: land 0.75s linear calc(var(--i) * 0.09s) both;
 }
 
 body.act .boulder {
