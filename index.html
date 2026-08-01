@@ -15,22 +15,23 @@
   <!-- Viewport 1 trigger -->
   <div class="viewport-one" aria-hidden="true"></div>
 
-  <!-- Exits sits permanently in B1 (top: 150vh).
-       Never visible in 1F, never tilts, never gets dragged down. -->
-  <section class="exits" aria-label="Elsewhere">
-    <ul class="places" id="places"></ul>
-    <!-- Email lives here and nowhere else. Changing it means editing this one line. -->
-    <p class="email"><a href="mailto:hello@siao.ai">hello@siao.ai</a></p>
-  </section>
-
-  <!-- Wreck holds Siao and statement.
-       Starts at 50vh in 1F. When struck, falls 250vh into the deep abyss (300vh),
-       clipped by stage 200vh. B1 contains ONLY hello@siao.ai. Siao is gone in B1. -->
+  <!-- One rigid body (.wreck).
+       The exits sit at a LOCKED ABSOLUTE DISTANCE (100vh) BELOW Siao.
+       During rest (1F / 50vh): Siao is at 50vh (1F), Mail is at 150vh (2nd floor / B1).
+       When struck: Whole rigid body falls 100vh together.
+       Siao lands at 150vh (2nd floor), Mail lands at 250vh.
+       Exits is inside .wreck (distance locked), but outside .card (does NOT rotate). -->
   <div class="wreck">
     <div class="card">
       <h1 class="name">Siao</h1>
       <p class="statement">The summit is a lie. The boulder is real.</p>
     </div>
+
+    <section class="exits" aria-label="Elsewhere">
+      <ul class="places" id="places"></ul>
+      <!-- Email lives here and nowhere else. Changing it means editing this one line. -->
+      <p class="email"><a href="mailto:hello@siao.ai">hello@siao.ai</a></p>
+    </section>
   </div>
 
   <div class="boulder" aria-hidden="true">

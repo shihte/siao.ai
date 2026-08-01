@@ -49,13 +49,12 @@ test.describe("who is steering", () => {
     expect(y).toBe(viewport);
   });
 
-  /* settle() finishes all animations instantly — the wreck drops 185vh,
-   * placing exits at 150vh (centre of Viewport 2). Scrolling to innerHeight
-   * brings the visitor to Viewport 2, where exits is right in front of them. */
+  /* settle() finishes all animations instantly — the wreck drops 100vh,
+   * placing exits at 250vh. Scrolling to the exits finds them cleanly. */
   test("going looking early still finds the exits", async ({ page }) => {
     await page.goto("/");
     await page.mouse.wheel(0, 1); // the visitor takes the wheel
-    await page.evaluate(() => window.scrollTo(0, window.innerHeight));
+    await page.evaluate(() => window.scrollTo(0, 1280));
     await expect(page.locator(".email a")).toBeInViewport();
     await expect(page.locator(".email a")).toHaveText("hello@siao.ai");
   });
