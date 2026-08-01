@@ -12,23 +12,25 @@
   --ink-dim: #6E6B65;
   --name-fs: clamp(4.5rem, 32vw, 22rem);
 
-  /* ---- Locked Distance Geometry ----
+  /* ---- 2F - 1F - B1 Locked Geometry ----
    *
-   * Absolute vertical distance between Siao and Mail is LOCKED at 100vh (--D).
+   * Absolute distance between Mail (in 2F) and Siao (in 1F) is LOCKED at --D (85vh).
    *
-   * Rest State (1F / scrollY = 0):
-   *   Siao is at 50vh (1F centre).
-   *   Mail is at 50vh + 100vh = 150vh (2nd floor / B1, off-screen below 1F).
+   * BEFORE STRIKE (Rest State):
+   *   2F (-35vh):  Mail (top: -85vh relative to wreck at 50vh, hidden above 1F)
+   *   1F (50vh):   Siao (centered in 1F)
+   *   B1 (135vh):  Empty
    *
-   * Struck State (Boulder hits Siao):
-   *   Whole rigid body (.wreck) translates 100vh together.
-   *   Siao falls 100vh: 50vh → 150vh (lands in 2nd floor / B1!).
-   *   Mail falls 100vh: 150vh → 250vh (3rd floor).
+   * AFTER STRIKE (Fall 85vh):
+   *   2F (-35vh):  Empty
+   *   1F (50vh):   Mail (pushed down 85vh into 1F, centered at 50vh in 1F!)
+   *   B1 (135vh):  Siao (pushed down 85vh into B1, centered at 135vh in B1!)
    *
-   * Distance between Siao and Mail is ALWAYS 100vh (locked). */
+   * Camera glides to B1 (scrollY = 85vh), where visitor sees Siao lying in B1.
+   * Visitor scrolling back UP to 1F sees Mail sitting in 1F. */
   --gap: 0.58;
-  --D: 100vh;
-  --delta: 100vh;
+  --D: 85vh;
+  --delta: 85vh;
 
   --fade-in: 0.5s;
   --hold: 5s;
@@ -53,8 +55,8 @@ body {
 
 .stage {
   position: relative;
-  height: 260vh;
-  height: 260svh;
+  height: 200vh;
+  height: 200svh;
   overflow: hidden;
 }
 
@@ -68,7 +70,7 @@ body {
 }
 
 /* One rigid body (.wreck).
-   Translates 100vh when struck. Never rotates (rotation is on .card). */
+   Starts at 50vh (1F). Translates 85vh when struck. Never rotates. */
 .wreck {
   position: absolute;
   top: 50vh;
@@ -78,14 +80,14 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .wreck { transform: translateY(100vh); }
+  .wreck { transform: translateY(85vh); }
 }
 
-/* Exits sits at locked distance D (100vh) BELOW Siao.
-   Starts at 150vh (2nd floor), falls to 250vh when struck. Level, unrotated. */
+/* Exits sits at locked distance D (85vh) ABOVE Siao (in 2F / -35vh at rest).
+   Starts at -35vh (2F, hidden above), falls to 50vh (1F) when struck. Level, unrotated. */
 .exits {
   position: absolute;
-  top: var(--D);
+  top: calc(-1 * var(--D));
   left: 0;
   right: 0;
   padding: 0 7vw;
@@ -191,18 +193,18 @@ a {
   100%  { transform: translateY(260.0vh) rotate(310deg); }
 }
 
-/* Wreck translates 100vh straight down.
-   Siao: 50vh + 100vh = 150vh (lands on 2nd floor / B1)
-   Mail: 150vh + 100vh = 250vh (3rd floor) */
+/* Wreck translates 85vh straight down:
+   Mail: -35vh →  50vh (lands in 1F)
+   Siao:  50vh → 135vh (lands in B1) */
 @keyframes struck {
   0%   { transform: translateY(0.00vh); }
-  10%  { transform: translateY(18.05vh); }
-  20%  { transform: translateY(36.20vh); }
-  30%  { transform: translateY(54.45vh); }
-  40%  { transform: translateY(72.80vh); }
-  50%  { transform: translateY(91.25vh); }
-  60%  { transform: translateY(100.00vh); }
-  100% { transform: translateY(100.00vh); }
+  10%  { transform: translateY(15.34vh); }
+  20%  { transform: translateY(30.77vh); }
+  30%  { transform: translateY(46.28vh); }
+  40%  { transform: translateY(61.88vh); }
+  50%  { transform: translateY(77.56vh); }
+  60%  { transform: translateY(85.00vh); }
+  100% { transform: translateY(85.00vh); }
 }
 
 @keyframes tumble {

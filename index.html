@@ -16,22 +16,22 @@
   <div class="viewport-one" aria-hidden="true"></div>
 
   <!-- One rigid body (.wreck).
-       The exits sit at a LOCKED ABSOLUTE DISTANCE (100vh) BELOW Siao.
-       During rest (1F / 50vh): Siao is at 50vh (1F), Mail is at 150vh (2nd floor / B1).
+       The exits sit at a LOCKED ABSOLUTE DISTANCE (100vh) ABOVE Siao (in 2F / -50vh at rest).
+       During rest (1F / 50vh): Siao is at 50vh (1F), Mail is at -50vh (2F, hidden above).
        When struck: Whole rigid body falls 100vh together.
-       Siao lands at 150vh (2nd floor), Mail lands at 250vh.
+       Mail lands at 50vh (1F), Siao lands at 150vh (B1).
        Exits is inside .wreck (distance locked), but outside .card (does NOT rotate). -->
   <div class="wreck">
-    <div class="card">
-      <h1 class="name">Siao</h1>
-      <p class="statement">The summit is a lie. The boulder is real.</p>
-    </div>
-
     <section class="exits" aria-label="Elsewhere">
       <ul class="places" id="places"></ul>
       <!-- Email lives here and nowhere else. Changing it means editing this one line. -->
       <p class="email"><a href="mailto:hello@siao.ai">hello@siao.ai</a></p>
     </section>
+
+    <div class="card">
+      <h1 class="name">Siao</h1>
+      <p class="statement">The summit is a lie. The boulder is real.</p>
+    </div>
   </div>
 
   <div class="boulder" aria-hidden="true">
