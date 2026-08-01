@@ -58,15 +58,21 @@ section {
 
 .places { list-style: none; }
 
-.places li,
-.email {
+.places li {
   font-size: clamp(1rem, 1.6vw, 1.25rem);
   line-height: 2;
 }
 
 .places li:not(:has(a)) { color: var(--ink-dim); }
 
-.places:not(:empty) + .email { margin-top: 2.5rem; }
+/* A way to reach the owner, not another place to go — smaller than the
+ * list above it, the same relationship the statement has to the name. */
+.email {
+  font-size: clamp(0.85rem, 1.2vw, 1rem);
+  letter-spacing: 0.02em;
+}
+
+.places:not(:empty) + .email { margin-top: 3rem; }
 
 a {
   color: inherit;
