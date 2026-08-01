@@ -96,6 +96,7 @@ function glide() {
 function play() {
   yield_();
   handedOver = false;
+  for (const a of document.getAnimations()) a.cancel();
   document.body.classList.remove("act");
   void document.body.offsetWidth; // reflow, so the animations restart
   document.body.classList.add("act");
@@ -133,4 +134,9 @@ if (!stillness.matches) {
     },
     { threshold: 0.2 }
   ).observe(first);
+
+  /* Returning to top (scrollY === 0) after taking control always restarts the act. */
+  addEventListener("scroll", () => {
+    if (window.scrollY === 0 && handedOver) play();
+  }, { passive: true });
 }
