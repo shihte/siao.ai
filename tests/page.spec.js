@@ -35,8 +35,63 @@ test.describe("what the visitor gets", () => {
     await expect(page).toHaveTitle("Siao");
     await expect(page.locator('meta[name="description"]')).toHaveAttribute(
       "content",
-      "The summit is a lie. The boulder is real."
+      "Siao — student, self-taught developer, working in Python and AI. The summit is a lie. The boulder is real."
     );
+  });
+});
+
+test.describe("who this is, to a machine", () => {
+  const DESCRIPTION =
+    "Siao — student, self-taught developer, working in Python and AI. The summit is a lie. The boulder is real.";
+
+  test("the canonical URL is unambiguous", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+      "href",
+      "https://siao.ai/"
+    );
+  });
+
+  test("a shared link renders a real preview card", async ({ page }) => {
+    await page.goto("/");
+    const og = (prop) => page.locator(`meta[property="og:${prop}"]`);
+    await expect(og("type")).toHaveAttribute("content", "website");
+    await expect(og("url")).toHaveAttribute("content", "https://siao.ai/");
+    await expect(og("title")).toHaveAttribute("content", "Siao");
+    await expect(og("description")).toHaveAttribute("content", DESCRIPTION);
+
+    await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute(
+      "content",
+      "summary"
+    );
+    await expect(page.locator('meta[name="twitter:title"]')).toHaveAttribute(
+      "content",
+      "Siao"
+    );
+  });
+
+  test("the Person claim is real, parseable JSON-LD", async ({ page }) => {
+    await page.goto("/");
+    const raw = await page
+      .locator('script[type="application/ld+json"]')
+      .textContent();
+    const data = JSON.parse(raw); // throws, and fails the test, if it isn't valid JSON
+
+    expect(data["@type"]).toBe("Person");
+    expect(data.name).toBe("Siao");
+    expect(data.url).toBe("https://siao.ai/");
+    expect(data.description.length).toBeGreaterThan(0);
+    // No age, no legal name — this is a public, indexed claim, not a bio.
+    expect(JSON.stringify(data)).not.toMatch(/\b\d{1,2}\s*(years?|歲)\b/i);
+  });
+
+  test("robots.txt explicitly allows everything", async ({ request }) => {
+    const res = await request.get("/robots.txt");
+    expect(res.status()).toBe(200);
+    const body = await res.text();
+    expect(body).toMatch(/User-agent:\s*\*/);
+    expect(body).toMatch(/Allow:\s*\//);
+    expect(body).not.toMatch(/Disallow/i);
   });
 });
 
