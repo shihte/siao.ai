@@ -45,22 +45,20 @@ test.describe("who is steering", () => {
   test("the page carries the visitor to the exits by itself", async ({ page }) => {
     await page.goto("/");
     await page.waitForTimeout(7500);
-    const [y, exits] = await page.evaluate(() => [
-      window.scrollY,
-      document.querySelector(".exits").offsetTop,
-    ]);
-    expect(y).toBe(exits);
+    const [y, viewport] = await page.evaluate(() => [window.scrollY, window.innerHeight]);
+    expect(y).toBe(viewport);
   });
 
-  /* Scene two starts invisible so it can land. If whatever reveals it ever
-   * breaks, the email is gone for good and nothing else would notice. */
-  test("the exits are actually legible once you arrive", async ({ page }) => {
+  /* The exits are carried into place by the fall rather than laid out where
+   * they end up, so anyone who arrives ahead of the fall arrives at nothing.
+   * Going looking has to be answered immediately, or the only way to make
+   * contact is invisible for several seconds. */
+  test("going looking early still finds the exits", async ({ page }) => {
     await page.goto("/");
-    await page.locator(".exits").scrollIntoViewIfNeeded();
-    await expect(page.locator(".email a")).toBeVisible();
-    await expect
-      .poll(() => page.locator(".email").evaluate((e) => getComputedStyle(e).opacity))
-      .toBe("1");
+    await page.mouse.wheel(0, 1); // the visitor takes the wheel
+    await page.evaluate(() => window.scrollTo(0, window.innerHeight));
+    await expect(page.locator(".email a")).toBeInViewport();
+    await expect(page.locator(".email a")).toHaveText("hello@siao.ai");
   });
 
   test("one flick of the wheel and it stops steering", async ({ page }) => {
@@ -85,10 +83,7 @@ test.describe("who is steering", () => {
     await page.waitForTimeout(300);
     await page.reload();
     await page.waitForTimeout(3800);
-    const [y, exits] = await page.evaluate(() => [
-      window.scrollY,
-      document.querySelector(".exits").offsetTop,
-    ]);
-    expect(y).toBe(exits);
+    const [y, viewport] = await page.evaluate(() => [window.scrollY, window.innerHeight]);
+    expect(y).toBe(viewport);
   });
 });
