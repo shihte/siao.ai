@@ -22,6 +22,14 @@ test.describe("what the visitor gets", () => {
     await expect(email).toHaveText("hello@siao.ai");
   });
 
+  test("the subdomains are listed and link out", async ({ page }) => {
+    await page.goto("/");
+    const links = page.locator(".places li a");
+    await expect(links).toHaveCount(2);
+    await expect(links.nth(0)).toHaveAttribute("href", "https://git.siao.ai");
+    await expect(links.nth(1)).toHaveAttribute("href", "https://app.siao.ai");
+  });
+
   test("the page is titled and described", async ({ page }) => {
     await page.goto("/");
     await expect(page).toHaveTitle("Siao");
