@@ -68,8 +68,10 @@ function yield_() {
 /* Because the exits are carried down by the blow rather than laid out where
  * they end up, arriving early means arriving at nothing. So if the visitor
  * has taken the wheel and gone looking, stop performing and put everything
- * where it lands. An empty screen is a worse answer than a spoiled trick. */
+ * where it lands. An empty screen is a worse answer than a spoiled trick.
+ * Never settle if the visitor is looking at Viewport 1 (scrollY < 100). */
 function settle() {
+  if (window.scrollY < 100) return;
   for (const a of document.getAnimations()) a.finish();
 }
 
@@ -126,7 +128,7 @@ if (!stillness.matches) {
       if (entry.isIntersecting) play();
       else {
         clearTimeout(pending);
-        if (handedOver) settle();
+        if (handedOver && window.scrollY > 100) settle();
       }
     },
     { threshold: 0.2 }
