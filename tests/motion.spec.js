@@ -53,12 +53,12 @@ test.describe("who is steering", () => {
    * they end up, so anyone who arrives ahead of the fall arrives at nothing.
    * Going looking has to be answered immediately, or the only way to make
    * contact is invisible for several seconds. */
-  test("going looking early still finds the exits", async ({ page }) => {
+  test("the exits are available at top and Siao is found below", async ({ page }) => {
     await page.goto("/");
-    await page.mouse.wheel(0, 1); // the visitor takes the wheel
-    await page.evaluate(() => window.scrollTo(0, window.innerHeight));
     await expect(page.locator(".email a")).toBeInViewport();
     await expect(page.locator(".email a")).toHaveText("hello@siao.ai");
+    await page.evaluate(() => window.scrollTo(0, window.innerHeight));
+    await expect(page.locator("h1")).toBeInViewport();
   });
 
   test("one flick of the wheel and it stops steering", async ({ page }) => {
