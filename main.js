@@ -116,27 +116,37 @@ addEventListener("keydown", (e) => { if (SCROLL_KEYS.has(e.key)) yield_(); });
 if (!stillness.matches) {
   root.classList.add("motion");
 
-  /* The browser sometimes restores scroll position across refreshes within
-   * the same session. If the page reloads at scrollY > 0, viewport-one is
-   * off-screen and the IntersectionObserver never fires play(). Forcing
-   * scrollY = 0 here guarantees the act always starts on a clean slate. */
+  /* Forcing scrollY = 0 here guarantees the act always starts on a clean slate. */
   window.scrollTo(0, 0);
 
-  /* Looking at the first viewport is the cue the act needs — lowering the
-   * threshold to 0.2 ensures returning visitors see Siao immediately reborn. */
+  /* Track scroll position to reliably restart the act whenever visitor returns to top. */
+  let atTop = true;
+  addEventListener("scroll", () => {
+    if (window.scrollY === 0) {
+      if (!atTop) {
+        atTop = true;
+        play();
+      }
+    } else if (window.scrollY > 100) {
+      atTop = false;
+    }
+  }, { passive: true });
+
   new IntersectionObserver(
     ([entry]) => {
-      if (entry.isIntersecting) play();
-      else {
+      if (entry.isIntersecting && window.scrollY < 50) {
+        if (!atTop) {
+          atTop = true;
+          play();
+        }
+      } else if (!entry.isIntersecting && window.scrollY > 100) {
         clearTimeout(pending);
-        if (handedOver && window.scrollY > 100) settle();
+        if (handedOver) settle();
       }
     },
     { threshold: 0.2 }
   ).observe(first);
 
-  /* Returning to top (scrollY === 0) after taking control always restarts the act. */
-  addEventListener("scroll", () => {
-    if (window.scrollY === 0 && handedOver) play();
-  }, { passive: true });
+  /* Initial trigger on load */
+  play();
 }
