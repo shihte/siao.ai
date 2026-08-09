@@ -73,8 +73,31 @@ for (const { path, lang, canonical, locale } of PAGES) {
   });
 }
 
-test("the sitemap lists both languages and nothing else", async ({ request }) => {
+test("the sitemap is an index spanning the hosts that exist", async ({ request }) => {
   const res = await request.get("/sitemap.xml");
+  expect(res.status()).toBe(200);
+  const body = await res.text();
+
+  // An index, not a page list: a <sitemapindex> may only contain other
+  // sitemaps, which is why the pages moved to their own file.
+  expect(body).toContain("<sitemapindex");
+  expect(body).not.toContain("<urlset");
+
+  const children = [...body.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
+  expect(children).toEqual([
+    "https://siao.ai/sitemap-pages.xml",
+    "https://git.siao.ai/sitemap.xml",
+  ]);
+
+  // apps.siao.ai has no DNS record. Listing a host that does not resolve
+  // is worse than omitting it — it is a crawl error on every fetch.
+  // Asserted against the entries rather than the file text, because the
+  // comment in that file explains the absence by naming it.
+  expect(children.some((url) => url.includes("apps.siao.ai"))).toBe(false);
+});
+
+test("the pages sitemap lists both languages and nothing else", async ({ request }) => {
+  const res = await request.get("/sitemap-pages.xml");
   expect(res.status()).toBe(200);
   const body = await res.text();
 
@@ -94,4 +117,15 @@ test("robots.txt says where the sitemap is", async ({ request }) => {
 
   const sitemap = await request.get("/sitemap.xml");
   expect(sitemap.status()).toBe(200); // the pointer resolves
+
+  // And so does every sitemap that one names, for this host. The
+  // git.siao.ai entry is another origin and another repository's
+  // deploy, so it is not this suite's to assert.
+  const body2 = await sitemap.text();
+  const own = [...body2.matchAll(/<loc>(https:\/\/siao\.ai[^<]*)<\/loc>/g)].map((m) => m[1]);
+  expect(own.length).toBeGreaterThan(0);
+  for (const url of own) {
+    const child = await request.get(new URL(url).pathname);
+    expect(child.status(), url).toBe(200);
+  }
 });
