@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Two URLs. This file was judged pointless while the site was a single
+     page, and it was: a sitemap of one entry is a formality. It earns its
+     place now only because there is genuinely a second address, and because
+     it is the one place that states the language pairing to a crawler that
+     hasn't fetched either page yet. -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://siao.ai/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://siao.ai/"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://siao.ai/zh/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://siao.ai/"/>
+  </url>
+  <url>
+    <loc>https://siao.ai/zh/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://siao.ai/"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://siao.ai/zh/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://siao.ai/"/>
+  </url>
+</urlset>

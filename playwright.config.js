@@ -4,19 +4,15 @@ export default defineConfig({
   testDir: "./tests",
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
-  /* The dev server behind webServer.command is a bare python3 http.server —
-   * simple on purpose, matching the no-build-step choice for the site
-   * itself, but under a burst of near-simultaneous requests from several
-   * parallel workers it can occasionally drop one. When that happens to be
-   * styles.css, the page renders unstyled and every test in that context
-   * fails together, not with a subtle diff. One retry re-navigates against
-   * a server that's no longer under that same burst; a genuine regression
-   * fails it again. */
+  /* One retry on CI only, as generic insurance against a hosted runner
+   * stalling. This used to carry a specific justification — the old python3
+   * http.server dropped requests under parallel load — which no longer
+   * applies now that scripts/serve.js answers instead. */
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? "github" : "list",
   use: {
     /* 127.0.0.1, not localhost: on machines that resolve localhost to ::1
-     * first, nothing answers — http.server listens on IPv4 only. */
+     * first, nothing answers — the test server listens on IPv4 only. */
     baseURL: "http://127.0.0.1:4173",
     trace: "on-first-retry",
   },
@@ -29,7 +25,7 @@ export default defineConfig({
     { name: "desktop", use: { ...devices["Desktop Chrome"] } },
   ],
   webServer: {
-    command: "python3 -m http.server 4173 --bind 127.0.0.1",
+    command: "node scripts/serve.js",
     url: "http://127.0.0.1:4173",
     reuseExistingServer: !process.env.CI,
   },

@@ -198,3 +198,123 @@ a {
   border-bottom: 1px solid currentColor;
   padding-bottom: 0.08em;
 }
+
+/* ---- The wrong address ----
+ *
+ * Same paper, same ink, same centred composition — a 404 that reads as part
+ * of the site rather than as the server's own error page. No search box, no
+ * sitemap: the site is small enough that the only useful offer is the way
+ * back.
+ */
+
+.lost .eyebrow { margin-bottom: 1.2rem; }
+
+.notice {
+  font-size: clamp(1.4rem, 2.4vw, 1.9rem);
+  font-weight: 400;
+  line-height: 1.3;
+}
+
+.back {
+  margin-top: clamp(1.5rem, 4vmin, 3rem);
+  font-size: clamp(1.05rem, 1.5vw, 1.25rem);
+}
+
+.back a {
+  color: var(--ink-dim);
+  transition: color 0.2s ease;
+}
+
+.back a:hover,
+.back a:focus-visible { color: var(--ink); }
+
+/* ---- The colophon ----
+ *
+ * Deliberately NOT a full-viewport section like the two above it. A third
+ * screen-filling block would promise the weight of a third act; this is an
+ * endnote, and it should read as one — natural height, generous air, the same
+ * centred 600px column so it lines up with the exits above.
+ */
+
+.colophon {
+  min-height: 0;
+  align-items: center;
+  padding-top: 0;
+  padding-bottom: clamp(4rem, 12vmin, 8rem);
+}
+
+.colophon-content {
+  width: 100%;
+  max-width: 600px;
+  border-top: 1px solid rgba(26, 26, 26, 0.14);
+  padding-top: 2.5rem;
+}
+
+.colophon p:not(.eyebrow) {
+  font-style: italic;
+  font-size: clamp(0.82rem, 1.15vw, 0.95rem);
+  line-height: 1.7;
+  color: var(--ink-dim);
+}
+
+.colophon p + p:not(.eyebrow) { margin-top: 1.1rem; }
+
+/* ---- Chinese ----
+ *
+ * A subset of Noto Serif TC holding only the characters these pages actually
+ * use — a few dozen, so the file is smaller than the Latin Garamond above it.
+ * Self-hosted for the same reason Garamond is: a third-party CDN would hand
+ * every visitor's IP to someone else for the privilege of a font.
+ *
+ * The stack puts Garamond first and Noto second on purpose. Latin glyphs
+ * (Siao, git.siao.ai, EN) come from Garamond either way; the browser only
+ * reaches Noto for characters Garamond has never heard of.
+ */
+
+@font-face {
+  font-family: "Noto Serif TC";
+  src: url("/fonts/noto-serif-tc-subset.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+
+body { font-family: "EB Garamond", "Noto Serif TC", Georgia, serif; }
+
+/* These two labels live in CSS content rather than markup, following the
+   existing "contact"/"soon" treatment — so their Chinese has to live here
+   too. Both are inside the subset. */
+html[lang^="zh"] .email::before { content: "聯絡"; }
+html[lang^="zh"] .places li:not(:has(a))::after { content: "即將"; }
+
+/* Chinese text has no descender-driven rhythm to lean on; it needs the extra
+   leading to stop reading as a wall. */
+html[lang^="zh"] .colophon p:not(.eyebrow) { line-height: 1.9; }
+html[lang^="zh"] .eyebrow { letter-spacing: 0.25em; }
+
+/* ---- The language switch ----
+ *
+ * Positioned, not fixed. It is there when you arrive — the one moment it is
+ * ever needed, when the page has opened in a language you don't read — and it
+ * stays behind as you scroll rather than following you down the page as a
+ * permanent piece of furniture. This page has no navigation bar and this is
+ * not the beginning of one.
+ */
+
+.lang-switch {
+  position: absolute;
+  top: clamp(1.2rem, 3vmin, 2rem);
+  right: clamp(1.2rem, 4vw, 2.5rem);
+  z-index: 1;
+  font-size: clamp(0.7rem, 1vw, 0.8rem);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.lang-switch a {
+  color: var(--ink-dim);
+  transition: color 0.2s ease;
+}
+
+.lang-switch a:hover,
+.lang-switch a:focus-visible { color: var(--ink); }

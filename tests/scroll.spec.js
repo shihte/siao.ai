@@ -25,3 +25,13 @@ test("reduced motion never scrolls on its own", async ({ page }) => {
   await page.waitForTimeout(4500);
   expect(await page.evaluate(() => window.scrollY)).toBe(0);
 });
+
+/* The colophon is for people who choose to keep going. If the page ever starts
+ * delivering them there by itself, it has turned a footnote into a
+ * destination. */
+test("the page never carries you as far as the colophon", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator(".email a")).toBeInViewport({ timeout: 6000 });
+  await page.waitForTimeout(500);
+  await expect(page.locator(".colophon")).not.toBeInViewport();
+});

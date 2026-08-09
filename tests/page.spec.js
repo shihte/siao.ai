@@ -6,6 +6,8 @@ import { readFile } from "node:fs/promises";
 /* These tests assert only what a visitor can see, click or hear. There is
  * no module to call: the page is the seam. */
 
+const PAGES = ["index.html", "zh/index.html", "404.html"];
+
 test.describe("what the visitor gets", () => {
   test("the card says who this is", async ({ page }) => {
     await page.goto("/");
@@ -123,13 +125,18 @@ test.describe("assets", () => {
     expect(res.status()).toBe(200);
   });
 
-  test("the markup is valid", async () => {
-    const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
-    const report = await new HtmlValidate({
-      extends: ["html-validate:recommended"],
-    }).validateString(html);
-    expect(report.results.flatMap((r) => r.messages)).toEqual([]);
-  });
+  /* Every page the site ships, not just the homepage — a second and third
+   * hand-written HTML file is exactly the situation where one of them quietly
+   * drifts out of validity. */
+  for (const file of PAGES) {
+    test(`the markup is valid — ${file}`, async () => {
+      const html = await readFile(new URL(`../${file}`, import.meta.url), "utf8");
+      const report = await new HtmlValidate({
+        extends: ["html-validate:recommended"],
+      }).validateString(html);
+      expect(report.results.flatMap((r) => r.messages)).toEqual([]);
+    });
+  }
 });
 
 test.describe("everyone can read it", () => {
