@@ -2,11 +2,18 @@ import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { HtmlValidate } from "html-validate";
 import { readFile } from "node:fs/promises";
+import { LANGUAGES } from "../i18n.js";
 
 /* These tests assert only what a visitor can see, click or hear. There is
  * no module to call: the page is the seam. */
 
-const PAGES = ["index.html", "zh/index.html", "404.html"];
+/* Every page the site ships. Ten of them are generated, which is exactly the
+ * situation where one branch of a template quietly produces invalid markup
+ * that nobody looks at — /ar/ and /ko/ get read as rarely as any file here. */
+const PAGES = [
+  ...LANGUAGES.map((l) => `${l.path.replace(/^\//, "")}index.html`),
+  "404.html",
+];
 
 test.describe("what the visitor gets", () => {
   test("the card says who this is", async ({ page }) => {
@@ -125,9 +132,6 @@ test.describe("assets", () => {
     expect(res.status()).toBe(200);
   });
 
-  /* Every page the site ships, not just the homepage — a second and third
-   * hand-written HTML file is exactly the situation where one of them quietly
-   * drifts out of validity. */
   for (const file of PAGES) {
     test(`the markup is valid — ${file}`, async () => {
       const html = await readFile(new URL(`../${file}`, import.meta.url), "utf8");
@@ -140,11 +144,17 @@ test.describe("assets", () => {
 });
 
 test.describe("everyone can read it", () => {
-  test("no accessibility violations", async ({ page }) => {
-    await page.goto("/");
-    const { violations } = await new AxeBuilder({ page }).analyze();
-    expect(violations).toEqual([]);
-  });
+  /* Two of the ten: the Latin page and the right-to-left one. Those are the
+   * only two layouts — the other eight differ from the first by two sentences
+   * of text, and running axe over all ten would be nine copies of one result
+   * for the cost of the tenth. */
+  for (const path of ["/", "/ar/"]) {
+    test(`no accessibility violations — ${path}`, async ({ page }) => {
+      await page.goto(path);
+      const { violations } = await new AxeBuilder({ page }).analyze();
+      expect(violations).toEqual([]);
+    });
+  }
 
   test("the name is the page heading", async ({ page }) => {
     await page.goto("/");

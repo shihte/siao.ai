@@ -9,6 +9,9 @@
  *     trailing slash
  *   - an unknown path serves 404.html *with a 404 status*, which is what
  *     makes "does this page exist" an answerable question in a test
+ *   - _redirects is honoured, so /zh/ leads to /zh-hant/ here exactly as it
+ *     will in production. Only the tiny slice of that file's syntax this site
+ *     uses: a path, a target, a status, and a trailing /* wildcard
  *
  * It is not shipped, imported, or part of the site. The site itself still has
  * no build step and no dependencies; this is test scaffolding, and it is
@@ -49,7 +52,32 @@ const resolve = (urlPath) => {
   return join(ROOT, asDirectory ? `${clean.replace(/\/?$/, "/")}index.html` : clean);
 };
 
+/* Read once at startup, like Pages does at deploy time. */
+const redirects = (
+  await readFile(join(ROOT, "_redirects"), "utf8").catch(() => "")
+)
+  .split("\n")
+  .map((line) => line.trim())
+  .filter((line) => line && !line.startsWith("#"))
+  .map((line) => {
+    const [from, to, status] = line.split(/\s+/);
+    return { from: from.replace(/\/\*$/, ""), wildcard: from.endsWith("/*"), to, status: Number(status) || 302 };
+  });
+
+const redirectFor = (urlPath) => {
+  const clean = urlPath.split("?")[0];
+  return redirects.find((r) =>
+    r.wildcard ? clean === r.from || clean.startsWith(r.from + "/") : clean === r.from
+  );
+};
+
 createServer(async (req, res) => {
+  const moved = redirectFor(req.url);
+  if (moved) {
+    res.writeHead(moved.status, { location: moved.to }).end();
+    return;
+  }
+
   const path = resolve(req.url);
   const send = (status, body, type) =>
     res.writeHead(status, { "content-type": type }).end(body);

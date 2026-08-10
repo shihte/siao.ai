@@ -1,96 +1,25 @@
+/* Three small behaviours. Everything this file does is an improvement on a
+ * page that already works without it: the exits are in the HTML, the language
+ * menu is a <details> that opens on its own, and every language is a real
+ * link. Turn JavaScript off and you lose an automatic scroll, a remembered
+ * preference and two ways of closing a menu — nothing you can't reach.
+ *
+ * The exits used to be rendered here from an array. They are generated into
+ * the HTML now (scripts/build.js), because the site's only outbound links
+ * should not depend on a script running.
+ */
+
 /* A refresh is a fresh visit, not a return to wherever you'd scrolled to —
  * the browser's own scroll restoration disagrees, so turn it off. Must run
  * before anything else, synchronously, or the restore already happened. */
 history.scrollRestoration = "manual";
 
-/* The exits.
+/* ---- Stay on the card long enough and the page moves on for you ----
  *
- * Add a subdomain by adding one entry. Nothing else needs to change — not the
- * layout, and not the Chinese page, which renders from this same array.
- *
- *   { name: "git.siao.ai", url: "https://git.siao.ai",
- *     desc: { en: "…", zh: "…" }, live: true }
- *
- * live: false renders as plain grey text with no link, so a place that
- * isn't up yet can't send anyone to a 404.
- *
- * The descriptions are sentences, not labels: "code & repositories" told a
- * visitor nothing they couldn't guess from the word "git".
+ * Any sign of intent from the visitor — scroll, touch, a key — cancels it for
+ * good; once you've touched the page yourself, it doesn't try to steer again.
  */
-const PLACES = [
-  {
-    name: "git.siao.ai",
-    url: "https://git.siao.ai",
-    desc: {
-      en: "a self-hosted git server, and a front end written for it",
-      zh: "自架的 git 伺服器，以及為它寫的前台",
-    },
-    live: true,
-  },
-  {
-    name: "apps.siao.ai",
-    url: "https://apps.siao.ai",
-    desc: {
-      en: "web applications, running on the same machine",
-      zh: "跑在同一台機器上的網頁應用",
-    },
-    live: true,
-  },
-];
 
-/* Which language this copy of the page is. The document says so already —
- * asking it is cheaper than keeping a second record that can disagree. */
-const LANG = document.documentElement.lang.startsWith("zh") ? "zh" : "en";
-
-const list = document.getElementById("places");
-
-for (const place of PLACES) {
-  const li = document.createElement("li");
-  if (place.live) {
-    const a = document.createElement("a");
-    a.href = place.url;
-
-    const info = document.createElement("span");
-    info.className = "place-info";
-
-    const name = document.createElement("span");
-    name.className = "place-name";
-    name.textContent = place.name;
-    info.append(name);
-
-    if (place.desc) {
-      const desc = document.createElement("span");
-      desc.className = "place-desc";
-      desc.textContent = place.desc[LANG];
-      info.append(desc);
-    }
-
-    a.append(info);
-    li.append(a);
-  } else {
-    const info = document.createElement("span");
-    info.className = "place-info";
-
-    const name = document.createElement("span");
-    name.className = "place-name";
-    name.textContent = place.name;
-    info.append(name);
-
-    if (place.desc) {
-      const desc = document.createElement("span");
-      desc.className = "place-desc";
-      desc.textContent = place.desc[LANG];
-      info.append(desc);
-    }
-
-    li.append(info);
-  }
-  list.append(li);
-}
-
-/* Stay on the card long enough and the page moves on for you. Any sign of
- * intent from the visitor — scroll, touch, a key — cancels it for good;
- * once you've touched the page yourself, it doesn't try to steer again. */
 const HOLD_MS = 4000;
 
 const stillness = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -109,16 +38,34 @@ if (!stillness.matches) {
   addEventListener("pointerdown", cancel, { passive: true, once: true });
 }
 
-/* Taking the switch is a decision, and decisions get remembered. Everything
- * else about the link works without this — it is a real href to a real page —
- * so a visitor whose storage is unavailable simply gets asked again next
- * time, rather than getting nothing. */
-const switcher = document.querySelector(".lang-switch a");
+/* ---- The language menu ---- */
 
-if (switcher) {
-  switcher.addEventListener("click", () => {
-    try {
-      localStorage.setItem("lang", switcher.getAttribute("lang").startsWith("zh") ? "zh" : "en");
-    } catch (e) {}
+const menu = document.querySelector(".lang-menu");
+
+if (menu) {
+  /* Choosing a language is a decision, and decisions get remembered — it
+   * outranks the browser's own setting from then on, because a browser
+   * language is wrong often enough (anyone reading Chinese on an
+   * English-configured machine) that being unable to overrule it would be the
+   * real defect. The link works without any of this; a visitor whose storage
+   * is unavailable simply gets asked again next time. */
+  for (const link of menu.querySelectorAll("a[hreflang]")) {
+    link.addEventListener("click", () => {
+      try {
+        localStorage.setItem("lang", link.getAttribute("hreflang"));
+      } catch (e) {}
+    });
+  }
+
+  /* Two ways out that <details> doesn't give you by itself. */
+  addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && menu.open) {
+      menu.open = false;
+      menu.querySelector("summary").focus();
+    }
+  });
+
+  addEventListener("pointerdown", (event) => {
+    if (menu.open && !menu.contains(event.target)) menu.open = false;
   });
 }

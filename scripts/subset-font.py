@@ -1,72 +1,93 @@
-"""Rebuild the Chinese subset font.
+"""Cut the shipped font files down to the characters this site draws.
 
-Run this whenever any Chinese text on the site changes:
+    python3 -m venv .venv && .venv/bin/pip install fonttools brotli
+    node scripts/build.js                 # refreshes fonts/characters.json
+    .venv/bin/python scripts/subset-font.py ~/Downloads/noto-sources
 
-    pip install fonttools brotli
-    curl -sLO https://github.com/notofonts/noto-cjk/raw/main/Serif/SubsetOTF/TC/NotoSerifTC-Regular.otf
-    python3 scripts/subset-font.py NotoSerifTC-Regular.otf
+Run it whenever any non-English text in i18n.js changes. The source faces are
+deliberately NOT committed — they are tens of megabytes of input to a one-off,
+reproducible step, and the outputs are what the site serves. Download them
+into one directory first:
 
-Why a subset at all: the full Traditional Chinese face is ~8MB. These pages
-use a few dozen characters. Shipping only those turns "self-host the Chinese
-type" from an absurd idea into a file smaller than the Latin one.
+    NotoSerifSC-Regular.otf   github.com/notofonts/noto-cjk  Serif/SubsetOTF/SC
+    NotoSerifJP-Regular.otf   github.com/notofonts/noto-cjk  Serif/SubsetOTF/JP
+    NotoSerifKR-Regular.otf   github.com/notofonts/noto-cjk  Serif/SubsetOTF/KR
+    NotoSerifTC-Regular.otf   github.com/notofonts/noto-cjk  Serif/SubsetOTF/TC
+    NotoNaskhArabic-Regular.ttf   github.com/notofonts/notofonts.github.io
+
+Two faces here are not built by this script and are not in the list above:
+
+  eb-garamond-latin.woff2 and eb-garamond-cyrillic.woff2 are Google's own
+  per-script builds of EB Garamond, downloaded as-is. Cutting them further
+  would save a few kilobytes and cost the ability to add a word without
+  regenerating anything.
 
 Why the character list is derived rather than maintained: a hand-kept list is
-a second copy of the site's own text, and the two drift. This reads the real
-sources instead, so the only way to get it wrong is to not run the script —
-which is precisely what the missing-glyph test in the suite exists to catch.
+a second copy of the site's own text, and the two drift. scripts/build.js
+writes fonts/characters.json from i18n.js, this reads it, and the missing-glyph
+test in the suite catches the case where neither was re-run.
 
-The source .otf is deliberately NOT committed. It is 8MB of input to a
-one-off, reproducible step; the output is what the site serves.
+Why a subset at all: a full Traditional Chinese face is ~8MB and these pages
+use a few dozen characters each. Shipping only those turns "self-host the CJK
+type" from an absurd idea into files smaller than the Latin one.
 """
 
-import re
+import json
 import sys
 from pathlib import Path
 
 from fontTools.subset import main as subset
 
 ROOT = Path(__file__).resolve().parent.parent
+MANIFEST = ROOT / "fonts" / "characters.json"
 
-# Every file that can contain Chinese the visitor will see: the page itself,
-# the exits data, and the CSS content labels ("聯絡", "即將").
-SOURCES = ["zh/index.html", "index.html", "404.html", "main.js", "styles.css"]
-
-OUT = ROOT / "fonts" / "noto-serif-tc-subset.woff2"
-
-
-def characters() -> str:
-    """Every non-ASCII character appearing anywhere in the sources.
-
-    A superset of what is strictly rendered — comments and metadata are
-    swept in too. That is the safe direction to be wrong in: a handful of
-    extra glyphs costs bytes, a missing one costs a visible tofu box.
-    """
-    seen = set()
-    for name in SOURCES:
-        text = (ROOT / name).read_text(encoding="utf-8")
-        seen.update(c for c in text if ord(c) > 0x7F)
-    return "".join(sorted(seen))
+# manifest key -> (source file name, output file name)
+FACES = {
+    "tc": ("NotoSerifTC-Regular.otf", "noto-serif-tc-subset.woff2"),
+    "sc": ("NotoSerifSC-Regular.otf", "noto-serif-sc-subset.woff2"),
+    "jp": ("NotoSerifJP-Regular.otf", "noto-serif-jp-subset.woff2"),
+    "kr": ("NotoSerifKR-Regular.otf", "noto-serif-kr-subset.woff2"),
+    "arabic": ("NotoNaskhArabic-Regular.ttf", "noto-naskh-arabic-subset.woff2"),
+    # Han for the switcher comes from the Simplified face: it is the only one
+    # of the four holding every character the ten language names need — 简 is
+    # absent from both the Traditional and the Japanese face.
+    "switcher-han": ("NotoSerifSC-Regular.otf", "switcher-han-subset.woff2"),
+    "switcher-hangul": ("NotoSerifKR-Regular.otf", "switcher-hangul-subset.woff2"),
+}
 
 
-def main() -> None:
-    if len(sys.argv) != 2:
-        sys.exit(f"usage: {sys.argv[0]} <path to NotoSerifTC-Regular.otf>")
+def main(sources: Path) -> None:
+    characters = json.loads(MANIFEST.read_text())
 
-    chars = characters()
-    print(f"{len(chars)} characters: {chars}")
+    for key, (source_name, output_name) in FACES.items():
+        wanted = characters.get(key, "")
+        if not wanted:
+            print(f"{key}: nothing to cut, skipped")
+            continue
 
-    subset([
-        sys.argv[1],
-        f"--text={chars}",
-        "--flavor=woff2",
-        f"--output-file={OUT}",
-        # Layout features the page never triggers, dropped rather than carried.
-        "--layout-features=",
-        "--no-hinting",
-        "--desubroutinize",
-    ])
-    print(f"{OUT.relative_to(ROOT)}: {OUT.stat().st_size / 1024:.1f} KB")
+        source = sources / source_name
+        if not source.exists():
+            sys.exit(f"Missing source face: {source}")
+
+        output = ROOT / "fonts" / output_name
+        subset(
+            [
+                str(source),
+                "--text=" + wanted,
+                "--flavor=woff2",
+                f"--output-file={output}",
+                # Arabic is drawn by substitution, not by codepoint: drop the
+                # layout tables and every letter renders in its isolated form.
+                # The CJK faces don't need this and aren't harmed by it.
+                "--layout-features=*",
+                "--no-hinting",
+                "--desubroutinize",
+            ]
+        )
+        print(f"{output.relative_to(ROOT)}: {len(wanted)} characters, {output.stat().st_size:,} bytes")
 
 
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) != 2:
+        sys.exit(__doc__)
+    main(Path(sys.argv[1]).expanduser())

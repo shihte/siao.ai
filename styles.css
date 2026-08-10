@@ -1,9 +1,89 @@
+/* ---- The faces ----
+ *
+ * All self-hosted, all subset to the characters these pages actually use. A
+ * third-party CDN would hand every visitor's IP to someone else for the
+ * privilege of a font.
+ *
+ * A page only downloads what it draws. Latin is on every page — the name, the
+ * statement, "elsewhere", the address, the copyright line are English in all
+ * ten languages — and each language adds at most one more file for its own
+ * two sentences. The two switcher faces are the exception: they carry the
+ * nine other language names in the menu, so they belong to no single page,
+ * and they are fetched only when someone opens it (a closed <details> is
+ * display:none, and browsers don't load fonts for text they aren't drawing).
+ */
+
 @font-face {
   font-family: "EB Garamond";
   src: url("/fonts/eb-garamond-latin.woff2") format("woff2");
   font-weight: 400 500;
   font-style: normal;
   font-display: block; /* block, not swap: a flash of the wrong serif is worse than a moment of nothing */
+}
+
+/* Same family, different alphabet: the browser picks by codepoint, so the
+ * Russian page needs no special stack and no other page fetches this. */
+@font-face {
+  font-family: "EB Garamond";
+  src: url("/fonts/eb-garamond-cyrillic.woff2") format("woff2");
+  font-weight: 400 500;
+  font-style: normal;
+  font-display: block;
+  unicode-range: U+0400-04FF, U+0500-052F, U+2DE0-2DFF, U+A640-A69F;
+}
+
+@font-face {
+  font-family: "Noto Serif TC";
+  src: url("/fonts/noto-serif-tc-subset.woff2") format("woff2");
+  font-weight: 400;
+  font-display: block;
+}
+
+@font-face {
+  font-family: "Noto Serif SC";
+  src: url("/fonts/noto-serif-sc-subset.woff2") format("woff2");
+  font-weight: 400;
+  font-display: block;
+}
+
+@font-face {
+  font-family: "Noto Serif JP";
+  src: url("/fonts/noto-serif-jp-subset.woff2") format("woff2");
+  font-weight: 400;
+  font-display: block;
+}
+
+@font-face {
+  font-family: "Noto Serif KR";
+  src: url("/fonts/noto-serif-kr-subset.woff2") format("woff2");
+  font-weight: 400;
+  font-display: block;
+}
+
+@font-face {
+  font-family: "Noto Naskh Arabic";
+  src: url("/fonts/noto-naskh-arabic-subset.woff2") format("woff2");
+  font-weight: 400;
+  font-display: block;
+}
+
+/* The menu's own two. Han from the Simplified face because it is the only one
+ * of the four that has every character the ten names need — 简 is missing
+ * from both the Traditional and Japanese faces. Hangul has to come from the
+ * Korean one. Kept as two files rather than merged: merging layout tables
+ * across two scripts buys nothing here, and both are a few kilobytes. */
+@font-face {
+  font-family: "Siao Switcher Han";
+  src: url("/fonts/switcher-han-subset.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap; /* swap, not block: this one arrives after the menu is already open */
+}
+
+@font-face {
+  font-family: "Siao Switcher Hangul";
+  src: url("/fonts/switcher-hangul-subset.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
 }
 
 :root {
@@ -228,69 +308,80 @@ a {
 .back a:hover,
 .back a:focus-visible { color: var(--ink); }
 
-/* ---- The colophon ----
+/* ---- The copyright line ----
  *
- * Deliberately NOT a full-viewport section like the two above it. A third
- * screen-filling block would promise the weight of a third act; this is an
- * endnote, and it should read as one — natural height, generous air, the same
- * centred 600px column so it lines up with the exits above.
+ * What is left of what used to be a third act. The colophon that stood here
+ * described the site to the visitor; it read as an explanation nobody had
+ * asked for, so it is gone, and the page is two scenes again as originally
+ * designed.
+ *
+ * This is not a replacement for it. It is punctuation: the smallest mark that
+ * says the page has ended rather than run out. Smaller than the eyebrow above
+ * it, the same dim ink, no rule above it — a hairline here would rebuild the
+ * frame the colophon was sitting in.
+ *
+ * The year is written by hand and does not update. Generating it in JS would
+ * make it the one piece of text that vanishes when scripts don't run;
+ * regenerating it every January would be an annual chore agreed to in advance.
+ * A copyright year marks the year of creation, so a fixed one is correct.
  */
 
-.colophon {
-  min-height: 0;
-  align-items: center;
-  padding-top: 0;
-  padding-bottom: clamp(4rem, 12vmin, 8rem);
-}
-
-.colophon-content {
-  width: 100%;
-  max-width: 600px;
-  border-top: 1px solid rgba(26, 26, 26, 0.14);
-  padding-top: 2.5rem;
-}
-
-.colophon p:not(.eyebrow) {
-  font-style: italic;
-  font-size: clamp(0.82rem, 1.15vw, 0.95rem);
-  line-height: 1.7;
+.copyright {
+  margin-top: clamp(3rem, 8vmin, 5rem);
+  font-size: clamp(0.7rem, 1vw, 0.8rem);
+  letter-spacing: 0.1em;
   color: var(--ink-dim);
 }
 
-.colophon p + p:not(.eyebrow) { margin-top: 1.1rem; }
+/* "© 2026 Siao" is English in every language, and on the Arabic page the
+ * bidirectional algorithm reads its leading © as neutral and hands it to the
+ * right-hand end — the line comes out as "Siao 2026 ©". The markup carries
+ * dir="ltr" to order the characters correctly; this puts the block back on
+ * the edge the rest of the page uses, which that attribute would otherwise
+ * flip. */
+html[dir="rtl"] .copyright { text-align: right; }
 
-/* ---- Chinese ----
+/* ---- Which face each language reads in ----
  *
- * A subset of Noto Serif TC holding only the characters these pages actually
- * use — a few dozen, so the file is smaller than the Latin Garamond above it.
- * Self-hosted for the same reason Garamond is: a third-party CDN would hand
- * every visitor's IP to someone else for the privilege of a font.
- *
- * The stack puts Garamond first and Noto second on purpose. Latin glyphs
- * (Siao, git.siao.ai, EN) come from Garamond either way; the browser only
- * reaches Noto for characters Garamond has never heard of.
+ * Garamond always comes first. Latin glyphs — the name, the hostnames, the
+ * English that every page keeps — come from it either way; the browser only
+ * reaches the second name for characters Garamond has never heard of, which
+ * means naming a face a page doesn't need costs that page nothing.
  */
 
-@font-face {
-  font-family: "Noto Serif TC";
-  src: url("/fonts/noto-serif-tc-subset.woff2") format("woff2");
-  font-weight: 400;
-  font-style: normal;
-  font-display: block;
-}
+body { font-family: "EB Garamond", Georgia, serif; }
 
-body { font-family: "EB Garamond", "Noto Serif TC", Georgia, serif; }
+html[lang="zh-Hant"] body { font-family: "EB Garamond", "Noto Serif TC", Georgia, serif; }
+html[lang="zh-Hans"] body { font-family: "EB Garamond", "Noto Serif SC", Georgia, serif; }
+html[lang="ja"] body { font-family: "EB Garamond", "Noto Serif JP", Georgia, serif; }
+html[lang="ko"] body { font-family: "EB Garamond", "Noto Serif KR", Georgia, serif; }
+html[lang="ar"] body { font-family: "EB Garamond", "Noto Naskh Arabic", Georgia, serif; }
 
-/* These two labels live in CSS content rather than markup, following the
-   existing "contact"/"soon" treatment — so their Chinese has to live here
-   too. Both are inside the subset. */
-html[lang^="zh"] .email::before { content: "聯絡"; }
-html[lang^="zh"] .places li:not(:has(a))::after { content: "即將"; }
+/* CJK text has no descender-driven rhythm to lean on; it needs the extra
+ * leading and the wider tracking to stop reading as a wall. The exit
+ * descriptions are the only prose left on the page, so this is all of it. */
+html[lang="zh-Hant"] .place-desc,
+html[lang="zh-Hans"] .place-desc,
+html[lang="ja"] .place-desc,
+html[lang="ko"] .place-desc { line-height: 1.9; }
 
-/* Chinese text has no descender-driven rhythm to lean on; it needs the extra
-   leading to stop reading as a wall. */
-html[lang^="zh"] .colophon p:not(.eyebrow) { line-height: 1.9; }
-html[lang^="zh"] .eyebrow { letter-spacing: 0.25em; }
+/* The descriptions are set in italic, which none of these scripts have. The
+ * browser will happily fake one by shearing the glyphs sideways — skewed kana
+ * and a slanted naskh are not emphasis, they are a mistake with a name
+ * (synthetic oblique). Upright instead, everywhere the italic isn't real. */
+html[lang="zh-Hant"] .place-desc,
+html[lang="zh-Hans"] .place-desc,
+html[lang="ja"] .place-desc,
+html[lang="ko"] .place-desc,
+html[lang="ar"] .place-desc { font-style: normal; }
+
+html[lang="zh-Hant"] .eyebrow,
+html[lang="zh-Hans"] .eyebrow,
+html[lang="ja"] .eyebrow,
+html[lang="ko"] .eyebrow { letter-spacing: 0.25em; }
+
+/* Arabic sits lower and larger at the same nominal size. */
+html[lang="ar"] .place-desc { line-height: 1.9; }
 
 /* ---- The language switch ----
  *
@@ -304,17 +395,80 @@ html[lang^="zh"] .eyebrow { letter-spacing: 0.25em; }
 .lang-switch {
   position: absolute;
   top: clamp(1.2rem, 3vmin, 2rem);
-  right: clamp(1.2rem, 4vw, 2.5rem);
+  /* Logical, not `right`: the Arabic page mirrors itself from this one word.
+     A visitor reading right-to-left starts their eye in the corner where the
+     switch would otherwise sit, and it would be in their way rather than out
+     of it. */
+  inset-inline-end: clamp(1.2rem, 4vw, 2.5rem);
   z-index: 1;
   font-size: clamp(0.7rem, 1vw, 0.8rem);
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  /* No uppercase: these are the languages' own names for themselves, and
+     ESPAÑOL is not one of them. */
+  text-align: end;
+  /* Garamond first, then the two faces that carry the other alphabets in the
+     list. Nothing here is fetched until the menu is opened. */
+  font-family: "EB Garamond", "Siao Switcher Han", "Siao Switcher Hangul",
+    "Noto Naskh Arabic", Georgia, serif;
 }
 
-.lang-switch a {
+/* ---- The menu ----
+ *
+ * <details> because it opens with no JavaScript: every language stays
+ * reachable when nothing runs. It is not a system control — <select> was
+ * ruled out — and nothing below is default browser rendering.
+ *
+ * Open, it is ten lines of small type on the page's own background. Not a
+ * card, not a popover: no border, no shadow, no radius. The one thing it
+ * borrows from a component is opacity, and only so the words behind it don't
+ * read through the words in front. A hairline here would be the only line on
+ * the entire site.
+ */
+
+.lang-menu summary {
+  list-style: none; /* the disclosure triangle, gone */
+  cursor: pointer;
   color: var(--ink-dim);
   transition: color 0.2s ease;
 }
 
-.lang-switch a:hover,
-.lang-switch a:focus-visible { color: var(--ink); }
+.lang-menu summary::-webkit-details-marker { display: none; }
+
+.lang-menu summary:hover,
+.lang-menu summary:focus-visible { color: var(--ink); }
+
+/* The list opens *over* the trigger, its first line landing exactly where the
+ * closed label was. Otherwise the language you are already reading appears
+ * twice, one line apart — the summary saying it, and the list saying it
+ * again. Sitting on top, the two are the same word in the same place. */
+.lang-menu ul {
+  list-style: none;
+  position: absolute;
+  top: 0;
+  inset-inline-end: 0;
+  background: var(--paper);
+  white-space: nowrap;
+}
+
+.lang-menu li + li { margin-top: 0.55rem; }
+
+.lang-menu a {
+  color: var(--ink-dim);
+  border-bottom: none; /* the site underlines links; ten underlines is a fence */
+  transition: color 0.2s ease;
+}
+
+.lang-menu a:hover,
+.lang-menu a:focus-visible { color: var(--ink); }
+
+/* Where you already are. Not a link, and the only dark word in the list. */
+.lang-menu [aria-current="page"] { color: var(--ink); }
+
+/* The closed switcher shows this page's own language, and this page already
+ * has a face for it. Saying so keeps the two switcher files out of every CJK
+ * page's initial load — they are for the nine names you can't see yet. */
+html[lang="zh-Hant"] .lang-menu summary { font-family: "EB Garamond", "Noto Serif TC", Georgia, serif; }
+html[lang="zh-Hans"] .lang-menu summary { font-family: "EB Garamond", "Noto Serif SC", Georgia, serif; }
+html[lang="ja"] .lang-menu summary { font-family: "EB Garamond", "Noto Serif JP", Georgia, serif; }
+html[lang="ko"] .lang-menu summary { font-family: "EB Garamond", "Noto Serif KR", Georgia, serif; }
+html[lang="ar"] .lang-menu summary { font-family: "EB Garamond", "Noto Naskh Arabic", Georgia, serif; }
