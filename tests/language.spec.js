@@ -60,6 +60,47 @@ test.describe("your own choice outranks your browser", () => {
     await page.goto("/");
     await expect(page).toHaveURL(/\/de\/$/); // and it stays corrected
   });
+
+  /* A preference is only worth honouring while it still names a language
+   * this site has. A value left over from a path that no longer exists —
+   * or from a hand-edited storage entry, or from the day `code` and
+   * `htmlLang` stop being the same string — used to be enough to stop the
+   * guess without replacing it: the script saw *something* remembered and
+   * returned, so the visitor stayed on English with no indication why and
+   * nothing to undo. Being unable to read the page is the one case where
+   * falling back to the browser's own setting is obviously right. */
+  for (const stale of ["zh", "de-DE", "klingon", ""]) {
+    test(`a remembered "${stale}" falls back to the browser rather than trapping you`, async ({
+      page,
+    }) => {
+      await page.goto("/");
+      await page.evaluate((value) => localStorage.setItem("lang", value), stale);
+
+      await page.goto("/");
+      await expect(page).toHaveURL(/\/zh-hant\/$/);
+    });
+  }
+
+  /* The preference is stored under the same key the redirect looks it up
+   * by. These are two different fields on the same row — the link carries
+   * `hreflang`, the table is keyed by `code` — and they happen to hold
+   * identical strings for all ten languages today. The first language
+   * whose region needs spelling (`pt-br` against `pt-BR`) would silently
+   * end the arrangement, and nothing would fail except the feature. */
+  test("remembers under the key the redirect reads", async ({ page }) => {
+    await page.goto("/");
+    await page.locator(".lang-menu summary").click();
+    await page.getByRole("link", { name: "日本語" }).click();
+    await expect(page).toHaveURL(/\/ja\/$/);
+
+    const remembered = await page.evaluate(() => localStorage.getItem("lang"));
+
+    // `code`, because that is what the redirect's lookup table is keyed
+    // by. Asserted against i18n.js rather than against anything the page
+    // exposes: the site should not have to publish its internals for
+    // this to be checkable.
+    expect(LANGUAGES.map((l) => l.code)).toContain(remembered);
+  });
 });
 
 test.describe("the menu", () => {

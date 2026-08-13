@@ -26,8 +26,13 @@ const stillness = window.matchMedia("(prefers-reduced-motion: reduce)");
 
 if (!stillness.matches) {
   let timer = setTimeout(() => {
-    if (window.scrollY < 50) {
-      document.querySelector(".exits").scrollIntoView({ behavior: "smooth" });
+    /* Guarded like the menu below it. This file is only loaded by the ten
+     * generated pages, which all have an .exits — but 404.html does not, and
+     * the day someone adds the script tag there is not the day they would
+     * think of this line. */
+    const exits = document.querySelector(".exits");
+    if (exits && window.scrollY < 50) {
+      exits.scrollIntoView({ behavior: "smooth" });
     }
   }, HOLD_MS);
 
@@ -49,10 +54,14 @@ if (menu) {
    * English-configured machine) that being unable to overrule it would be the
    * real defect. The link works without any of this; a visitor whose storage
    * is unavailable simply gets asked again next time. */
-  for (const link of menu.querySelectorAll("a[hreflang]")) {
+  for (const link of menu.querySelectorAll("a[data-lang]")) {
     link.addEventListener("click", () => {
       try {
-        localStorage.setItem("lang", link.getAttribute("hreflang"));
+        /* data-lang, not hreflang: the redirect on / looks this up in a table
+         * keyed by `code`, and hreflang carries `htmlLang`. The two are the
+         * same string for all ten languages, so reading the wrong one worked
+         * — until the first language whose region needs spelling. */
+        localStorage.setItem("lang", link.dataset.lang);
       } catch (e) {}
     });
   }

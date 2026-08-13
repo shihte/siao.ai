@@ -63,8 +63,14 @@ const guessScript = () => `<script>
   var PATHS = ${JSON.stringify(Object.fromEntries(LANGUAGES.map((l) => [l.code, l.path])))};
   try {
     var chosen = localStorage.getItem("lang");
-    if (chosen) {
-      if (PATHS[chosen] && PATHS[chosen] !== "/") location.replace(PATHS[chosen]);
+    /* Only if it still names one of these languages. A value left from a path
+       this site no longer has, a hand-edited entry, or an inherited property
+       like "constructor" used to be enough to stop the guess without
+       replacing it — the script saw something remembered and returned, and
+       the visitor stayed on English with nothing to explain it and nothing
+       to undo. Anything unrecognised falls through to the browser instead. */
+    if (chosen && Object.prototype.hasOwnProperty.call(PATHS, chosen)) {
+      if (PATHS[chosen] !== "/") location.replace(PATHS[chosen]);
       return;
     }
     var wanted = navigator.languages || [navigator.language || ""];
@@ -104,7 +110,13 @@ const menu = (current) => {
   const items = LANGUAGES.map((l) =>
     l.code === current.code
       ? `      <li><span aria-current="page" lang="${l.htmlLang}">${escape(l.endonym)}</span></li>`
-      : `      <li><a href="${l.path}" hreflang="${l.htmlLang}" lang="${l.htmlLang}">${escape(
+      : /* data-lang is `code`, which is what the guessing script's table is
+           keyed by; hreflang is `htmlLang`, which is what the document says.
+           They are identical strings for all ten languages today, so
+           remembering one and looking up the other worked by coincidence —
+           the first language whose region needs spelling (pt-br against
+           pt-BR) would have ended it with nothing failing but the feature. */
+        `      <li><a href="${l.path}" hreflang="${l.htmlLang}" lang="${l.htmlLang}" data-lang="${l.code}">${escape(
           l.endonym
         )}</a></li>`
   ).join("\n");

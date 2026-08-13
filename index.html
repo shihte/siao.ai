@@ -13,8 +13,14 @@
   var PATHS = {"en":"/","zh-Hant":"/zh-hant/","zh-Hans":"/zh-hans/","ja":"/ja/","ko":"/ko/","es":"/es/","fr":"/fr/","de":"/de/","ru":"/ru/","ar":"/ar/"};
   try {
     var chosen = localStorage.getItem("lang");
-    if (chosen) {
-      if (PATHS[chosen] && PATHS[chosen] !== "/") location.replace(PATHS[chosen]);
+    /* Only if it still names one of these languages. A value left from a path
+       this site no longer has, a hand-edited entry, or an inherited property
+       like "constructor" used to be enough to stop the guess without
+       replacing it — the script saw something remembered and returned, and
+       the visitor stayed on English with nothing to explain it and nothing
+       to undo. Anything unrecognised falls through to the browser instead. */
+    if (chosen && Object.prototype.hasOwnProperty.call(PATHS, chosen)) {
+      if (PATHS[chosen] !== "/") location.replace(PATHS[chosen]);
       return;
     }
     var wanted = navigator.languages || [navigator.language || ""];
@@ -106,15 +112,15 @@
     <summary lang="en">English</summary>
     <ul>
       <li><span aria-current="page" lang="en">English</span></li>
-      <li><a href="/zh-hant/" hreflang="zh-Hant" lang="zh-Hant">繁體中文</a></li>
-      <li><a href="/zh-hans/" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
-      <li><a href="/ja/" hreflang="ja" lang="ja">日本語</a></li>
-      <li><a href="/ko/" hreflang="ko" lang="ko">한국어</a></li>
-      <li><a href="/es/" hreflang="es" lang="es">Español</a></li>
-      <li><a href="/fr/" hreflang="fr" lang="fr">Français</a></li>
-      <li><a href="/de/" hreflang="de" lang="de">Deutsch</a></li>
-      <li><a href="/ru/" hreflang="ru" lang="ru">Русский</a></li>
-      <li><a href="/ar/" hreflang="ar" lang="ar">العربية</a></li>
+      <li><a href="/zh-hant/" hreflang="zh-Hant" lang="zh-Hant" data-lang="zh-Hant">繁體中文</a></li>
+      <li><a href="/zh-hans/" hreflang="zh-Hans" lang="zh-Hans" data-lang="zh-Hans">简体中文</a></li>
+      <li><a href="/ja/" hreflang="ja" lang="ja" data-lang="ja">日本語</a></li>
+      <li><a href="/ko/" hreflang="ko" lang="ko" data-lang="ko">한국어</a></li>
+      <li><a href="/es/" hreflang="es" lang="es" data-lang="es">Español</a></li>
+      <li><a href="/fr/" hreflang="fr" lang="fr" data-lang="fr">Français</a></li>
+      <li><a href="/de/" hreflang="de" lang="de" data-lang="de">Deutsch</a></li>
+      <li><a href="/ru/" hreflang="ru" lang="ru" data-lang="ru">Русский</a></li>
+      <li><a href="/ar/" hreflang="ar" lang="ar" data-lang="ar">العربية</a></li>
     </ul>
   </details>
 </header>
