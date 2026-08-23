@@ -49,6 +49,7 @@ export const SITE = {
 export const PLACES = [
   { key: "git", name: "git.siao.ai", url: "https://git.siao.ai", live: true },
   { key: "apps", name: "apps.siao.ai", url: "https://apps.siao.ai", live: true },
+  { key: "blog", name: "blog.siao.ai", url: "https://blog.siao.ai", live: true },
 ];
 
 /* Order matters twice: it is the order of the menu, and the first entry is the
@@ -72,6 +73,7 @@ export const LANGUAGES = [
     places: {
       git: "a self-hosted git server, and a front end written for it",
       apps: "web applications, running on the same machine",
+      blog: "writing about the work, with the journals it came from attached",
     },
   },
   {
@@ -91,6 +93,7 @@ export const LANGUAGES = [
     places: {
       git: "自己架的 git 伺服器，前台也是自己寫的",
       apps: "幾個網頁應用，跑在同一台機器上",
+      blog: "關於這些工作的文章，附上它們的原始日誌",
     },
   },
   {
@@ -107,6 +110,7 @@ export const LANGUAGES = [
     places: {
       git: "自己搭的 git 服务器，前端也是自己写的",
       apps: "几个网页应用，跑在同一台机器上",
+      blog: "关于这些工作的文章，附上它们的原始日志",
     },
   },
   {
@@ -123,6 +127,7 @@ export const LANGUAGES = [
     places: {
       git: "セルフホストの git サーバーと、自作のフロントエンド",
       apps: "同じマシンで動く Web アプリケーション",
+      blog: "作業についての文章と、その元になった作業ログ",
     },
   },
   {
@@ -139,6 +144,7 @@ export const LANGUAGES = [
     places: {
       git: "직접 운영하는 git 서버와 직접 만든 프런트엔드",
       apps: "같은 머신에서 돌아가는 웹 애플리케이션",
+      blog: "작업에 대한 글과, 그 바탕이 된 작업 일지",
     },
   },
   {
@@ -155,6 +161,7 @@ export const LANGUAGES = [
     places: {
       git: "un servidor git autoalojado y una interfaz hecha para él",
       apps: "aplicaciones web en la misma máquina",
+      blog: "textos sobre el trabajo, con los cuadernos de los que salieron",
     },
   },
   {
@@ -171,6 +178,7 @@ export const LANGUAGES = [
     places: {
       git: "un serveur git auto-hébergé et son interface dédiée",
       apps: "des applications web sur la même machine",
+      blog: "des textes sur le travail, avec les carnets dont ils sont issus",
     },
   },
   {
@@ -187,6 +195,7 @@ export const LANGUAGES = [
     places: {
       git: "ein selbst gehosteter git-Server mit eigenem Frontend",
       apps: "Webanwendungen auf derselben Maschine",
+      blog: "Texte über die Arbeit, mit den Journalen, aus denen sie stammen",
     },
   },
   {
@@ -203,6 +212,7 @@ export const LANGUAGES = [
     places: {
       git: "свой git-сервер и написанный для него интерфейс",
       apps: "веб-приложения на той же машине",
+      blog: "тексты о работе и рабочие журналы, из которых они выросли",
     },
   },
   {
@@ -219,6 +229,7 @@ export const LANGUAGES = [
     places: {
       git: "خادم git مُستضاف ذاتيًا وواجهة مكتوبة له",
       apps: "تطبيقات ويب على الجهاز نفسه",
+      blog: "كتابات عن العمل، مع دفاتر العمل التي انبثقت عنها",
     },
   },
 ];

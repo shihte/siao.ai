@@ -8,3 +8,8 @@ SPEC.md
 .scratch/
 .claude/
 ClaudeDocs/
+
+# The font-subsetting venv. scripts/subset-font.py documents how to
+# recreate it; the source faces it needs are tens of megabytes and are
+# deliberately not committed either.
+.venv/

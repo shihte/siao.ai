@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { PLACES } from "../i18n.js";
 import AxeBuilder from "@axe-core/playwright";
 import { HtmlValidate } from "html-validate";
 import { readFile } from "node:fs/promises";
@@ -34,9 +35,15 @@ test.describe("what the visitor gets", () => {
   test("the subdomains are listed and link out", async ({ page }) => {
     await page.goto("/");
     const links = page.locator(".places li a");
-    await expect(links).toHaveCount(2);
-    await expect(links.nth(0)).toHaveAttribute("href", "https://git.siao.ai");
-    await expect(links.nth(1)).toHaveAttribute("href", "https://apps.siao.ai");
+
+    // Counted from i18n.js, not written here. The exits are designed to grow
+    // — "日後每架好一個子網域，就多一行" (SPEC.md) — so a literal 2 was a
+    // number guaranteed to be wrong on the day the design worked.
+    const live = PLACES.filter((p) => p.live);
+    await expect(links).toHaveCount(live.length);
+    for (const [i, place] of live.entries()) {
+      await expect(links.nth(i)).toHaveAttribute("href", place.url);
+    }
   });
 
   test("the page is titled and described", async ({ page }) => {

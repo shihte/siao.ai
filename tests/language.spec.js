@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { LANGUAGES } from "../i18n.js";
+import { LANGUAGES, PLACES } from "../i18n.js";
 
 /* Guessing a visitor's language from their browser is only safe if guessing
  * wrong is cheap to undo. These tests are that promise, written down: the
@@ -175,7 +175,7 @@ test.describe("without JavaScript", () => {
     await page.goto("/");
     await expect(page).toHaveURL(/\/$/); // no guess is better than a broken guess
     await expect(page.locator("h1")).toHaveText("Siao");
-    await expect(page.locator(".places li a")).toHaveCount(2);
+    await expect(page.locator(".places li a")).toHaveCount(PLACES.filter((p) => p.live).length);
     await expect(page.locator(".copyright")).toHaveText("© 2026 Siao");
 
     await page.locator(".lang-menu summary").click();
