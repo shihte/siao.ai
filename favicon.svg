@@ -1,4 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <rect width="100" height="100" fill="#FAF9F6"/>
-  <text x="50" y="68" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="70" fill="#1A1A1A">S</text>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="_圖層_1" data-name="圖層_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 2048 2048">
+  <!-- Generator: Adobe Illustrator 30.7.0, SVG Export Plug-In . SVG Version: 2.1.4 Build 114)  -->
+  <path d="M1042.85,1513.63l-72.54,72.54-459.7-459.7c-19.1-19.1-43.79-31.61-70.49-35.71L0,1023.13l487.4,1.19c42.46.1,83.16,17.02,113.18,47.04l442.26,442.26Z" fill="#231815"/>
+  <rect x="1135.63" y="750.37" width="102.59" height="512.94" transform="translate(-364.3005 1134.1824) rotate(-45)" fill="#231815"/>
+  <rect x="1064.05" y="1112.03" width="102.59" height="512.94" transform="translate(1294.3498 -387.8408) rotate(45)" fill="#231815"/>
+  <rect x="811.2" y="784.64" width="102.59" height="512.94" transform="translate(2208.547 1167.4126) rotate(135)" fill="#231815"/>
+  <rect x="882.79" y="422.98" width="102.59" height="512.94" transform="translate(1114.1333 1820.3973) rotate(-135)" fill="#231815"/>
+  <path d="M1610.77,957.82l437.23,65.57-484.47.67c-42.68.06-83.62-16.87-113.8-47.04l-442.65-442.65,72.54-72.54,460.21,460.21c19.21,19.21,44.08,31.75,70.94,35.78Z" fill="#231815"/>
+  <path d="M545.29,1073.76" fill="#231815"/>
 </svg>
