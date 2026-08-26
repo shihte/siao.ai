@@ -134,7 +134,19 @@ test.describe("assets", () => {
 
   test("the favicon is served", async ({ request, page }) => {
     await page.goto("/");
-    const href = await page.locator('link[rel="icon"]').getAttribute("href");
+    const icons = await page.locator('link[rel="icon"]').all();
+    for (const icon of icons) {
+      const href = await icon.getAttribute("href");
+      const res = await request.get(href);
+      expect(res.status()).toBe(200);
+    }
+  });
+
+  test("the apple touch icon is served", async ({ request, page }) => {
+    await page.goto("/");
+    const href = await page
+      .locator('link[rel="apple-touch-icon"]')
+      .getAttribute("href");
     const res = await request.get(href);
     expect(res.status()).toBe(200);
   });

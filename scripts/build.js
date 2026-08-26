@@ -194,6 +194,8 @@ ${LANGUAGES.filter((l) => l.code !== lang.code)
 <meta name="twitter:description" content="${escape(lang.description)}">
 
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="/apple-icon.png">
 <link rel="preload" href="/fonts/eb-garamond-latin.woff2" as="font" type="font/woff2" crossorigin>
 ${
   lang.font
