@@ -50,6 +50,7 @@ export const PLACES = [
   { key: "git", name: "git.siao.ai", url: "https://git.siao.ai", live: true },
   { key: "apps", name: "apps.siao.ai", url: "https://apps.siao.ai", live: true },
   { key: "blog", name: "blog.siao.ai", url: "https://blog.siao.ai", live: true },
+  { key: "ccvs", name: "ccvs.siao.ai", url: "https://ccvs.siao.ai", live: true },
 ];
 
 /* Order matters twice: it is the order of the menu, and the first entry is the
@@ -74,6 +75,7 @@ export const LANGUAGES = [
       git: "a self-hosted git server, and a front end written for it",
       apps: "web applications, running on the same machine",
       blog: "writing about the work, with the journals it came from attached",
+      ccvs: "a petition site for a school rhythm-game club",
     },
   },
   {
@@ -94,6 +96,7 @@ export const LANGUAGES = [
       git: "自己架的 git 伺服器，前台也是自己寫的",
       apps: "幾個網頁應用，跑在同一台機器上",
       blog: "關於這些工作的文章，附上它們的原始日誌",
+      ccvs: "一個學生音遊社的連署站",
     },
   },
   {
@@ -111,6 +114,7 @@ export const LANGUAGES = [
       git: "自己搭的 git 服务器，前端也是自己写的",
       apps: "几个网页应用，跑在同一台机器上",
       blog: "关于这些工作的文章，附上它们的原始日志",
+      ccvs: "一个学生音游社的请愿站",
     },
   },
   {
@@ -128,6 +132,7 @@ export const LANGUAGES = [
       git: "セルフホストの git サーバーと、自作のフロントエンド",
       apps: "同じマシンで動く Web アプリケーション",
       blog: "作業についての文章と、その元になった作業ログ",
+      ccvs: "高校の音楽ゲーム部の署名サイト",
     },
   },
   {
@@ -145,6 +150,7 @@ export const LANGUAGES = [
       git: "직접 운영하는 git 서버와 직접 만든 프런트엔드",
       apps: "같은 머신에서 돌아가는 웹 애플리케이션",
       blog: "작업에 대한 글과, 그 바탕이 된 작업 일지",
+      ccvs: "고등학교 리듬게임 동아리의 서명 사이트",
     },
   },
   {
@@ -162,6 +168,7 @@ export const LANGUAGES = [
       git: "un servidor git autoalojado y una interfaz hecha para él",
       apps: "aplicaciones web en la misma máquina",
       blog: "textos sobre el trabajo, con los cuadernos de los que salieron",
+      ccvs: "un sitio de peticiones para un club escolar de videojuegos rítmicos",
     },
   },
   {
@@ -179,6 +186,7 @@ export const LANGUAGES = [
       git: "un serveur git auto-hébergé et son interface dédiée",
       apps: "des applications web sur la même machine",
       blog: "des textes sur le travail, avec les carnets dont ils sont issus",
+      ccvs: "un site de pétition pour un club scolaire de jeux rythmiques",
     },
   },
   {
@@ -196,6 +204,7 @@ export const LANGUAGES = [
       git: "ein selbst gehosteter git-Server mit eigenem Frontend",
       apps: "Webanwendungen auf derselben Maschine",
       blog: "Texte über die Arbeit, mit den Journalen, aus denen sie stammen",
+      ccvs: "eine Petitionsseite für einen schulischen Rhythmusspiel-Club",
     },
   },
   {
@@ -213,6 +222,7 @@ export const LANGUAGES = [
       git: "свой git-сервер и написанный для него интерфейс",
       apps: "веб-приложения на той же машине",
       blog: "тексты о работе и рабочие журналы, из которых они выросли",
+      ccvs: "сайт петиции школьного клуба ритм-игр",
     },
   },
   {
@@ -230,6 +240,7 @@ export const LANGUAGES = [
       git: "خادم git مُستضاف ذاتيًا وواجهة مكتوبة له",
       apps: "تطبيقات ويب على الجهاز نفسه",
       blog: "كتابات عن العمل، مع دفاتر العمل التي انبثقت عنها",
+      ccvs: "موقع عريضة لنادي ألعاب إيقاعية مدرسي",
     },
   },
 ];
