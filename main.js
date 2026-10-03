@@ -78,3 +78,19 @@ if (menu) {
     if (menu.open && !menu.contains(event.target)) menu.open = false;
   });
 }
+
+/* ---- One page view to the family's statistics ----
+ *
+ * The owner asked for one statistics page across every siao.ai site, with
+ * their own visits left out; the receiving end decides who that is
+ * (apps-siao-ai lib/woqu/self-traffic.ts). Sends the path and where the
+ * visitor came from — no query string, nothing about the visitor. Silent
+ * anywhere but siao.ai, so a local serve and the test suite send nothing.
+ * Like everything else in this file, the page loses nothing without it. */
+try {
+  const host = location.hostname;
+  if (host === "siao.ai" || host.endsWith(".siao.ai")) {
+    const body = JSON.stringify({ p: location.pathname, r: document.referrer });
+    navigator.sendBeacon("https://woqu.siao.ai/api/hit", new Blob([body], { type: "text/plain" }));
+  }
+} catch (e) {}
