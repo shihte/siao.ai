@@ -90,7 +90,9 @@ if (menu) {
 try {
   const host = location.hostname;
   if (host === "siao.ai" || host.endsWith(".siao.ai")) {
-    const body = JSON.stringify({ p: location.pathname, r: document.referrer });
+    // The referrer's origin only — the receiving end needs no more than the host.
+    const r = document.referrer ? new URL(document.referrer).origin : "";
+    const body = JSON.stringify({ p: location.pathname, r });
     navigator.sendBeacon("https://woqu.siao.ai/api/hit", new Blob([body], { type: "text/plain" }));
   }
 } catch (e) {}
