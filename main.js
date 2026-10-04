@@ -100,5 +100,25 @@ try {
       l: navigator.language,
     });
     navigator.sendBeacon("https://woqu.siao.ai/api/hit", new Blob([body], { type: "text/plain" }));
+    // Time on the page: only while it is visible, sent when it is hidden
+    // or left. The receiving end keeps it out of Umami.
+    let shown = document.visibilityState === "visible" ? Date.now() : null;
+    let total = 0;
+    const report = () => {
+      if (shown !== null) {
+        total += Date.now() - shown;
+        shown = null;
+      }
+      if (total >= 1000) {
+        const ping = JSON.stringify({ p: location.pathname, k: "engaged", v: Math.round(total) });
+        navigator.sendBeacon("https://woqu.siao.ai/api/hit", new Blob([ping], { type: "text/plain" }));
+      }
+      total = 0;
+    };
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "hidden") report();
+      else shown = Date.now();
+    });
+    addEventListener("pagehide", report);
   }
 } catch (e) {}
