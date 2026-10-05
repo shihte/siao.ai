@@ -76,10 +76,15 @@ test.describe("who this is, to a machine", () => {
     await expect(og("title")).toHaveAttribute("content", "Siao");
     await expect(og("description")).toHaveAttribute("content", DESCRIPTION);
 
+    // A large card with the page's own type on it, not a bare text link.
+    await expect(og("image")).toHaveAttribute("content", "https://siao.ai/og.png");
     await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute(
       "content",
-      "summary"
+      "summary_large_image"
     );
+    const image = await page.request.get("/og.png");
+    expect(image.status()).toBe(200);
+    expect(image.headers()["content-type"]).toContain("image/png");
     await expect(page.locator('meta[name="twitter:title"]')).toHaveAttribute(
       "content",
       "Siao"

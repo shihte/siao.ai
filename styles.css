@@ -119,7 +119,9 @@ section {
 .card { align-items: center; text-align: center; }
 
 .name {
-  font-size: clamp(4.5rem, 32vw, 22rem);
+  /* 40vw, not 32: on a phone the name filled under half the width and read
+   * as timid next to the desktop's. The ceiling is unchanged. */
+  font-size: clamp(5.5rem, 40vw, 22rem);
   font-weight: 400;
   line-height: 0.9;
   letter-spacing: -0.02em;
@@ -127,7 +129,8 @@ section {
 
 .statement {
   margin-top: clamp(1.5rem, 4vmin, 3rem);
-  font-size: clamp(0.72rem, 1.15vw, 0.95rem);
+  /* Never under 12.8px: at 0.72rem the line went to 11.5px on a phone. */
+  font-size: clamp(0.8rem, 1.15vw, 0.95rem);
   letter-spacing: 0.06em;
   color: var(--ink-dim);
 }
@@ -178,6 +181,9 @@ section {
   justify-content: space-between;
   align-items: center;
   padding: 1.1rem 0.35rem;
+  /* The inset gives the hover shift and the focus ring room; pulling it back
+   * out keeps the names on the same left edge as ELSEWHERE above them. */
+  margin-inline: -0.35rem;
   border-bottom: none;
   color: var(--ink);
   transition: padding-left 0.2s cubic-bezier(0.16, 1, 0.3, 1);
@@ -228,7 +234,7 @@ section {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.1rem 0.35rem;
+  padding: 1.1rem 0; /* on the same edge as ELSEWHERE, like the linked rows */
   color: var(--ink-dim);
   opacity: 0.45;
 }
@@ -249,6 +255,7 @@ section {
   align-items: center;
   margin-top: 2.5rem;
   padding: 0.35rem;
+  margin-inline: -0.35rem; /* CONTACT on the same edge as ELSEWHERE and © */
   font-size: clamp(1.05rem, 1.5vw, 1.25rem);
   letter-spacing: 0.02em;
 }
@@ -328,7 +335,7 @@ a {
 
 .copyright {
   margin-top: clamp(3rem, 8vmin, 5rem);
-  font-size: clamp(0.7rem, 1vw, 0.8rem);
+  font-size: clamp(0.75rem, 1vw, 0.8rem);
   letter-spacing: 0.1em;
   color: var(--ink-dim);
 }
@@ -401,7 +408,7 @@ html[lang="ar"] .place-desc { line-height: 1.9; }
      of it. */
   inset-inline-end: clamp(1.2rem, 4vw, 2.5rem);
   z-index: 1;
-  font-size: clamp(0.7rem, 1vw, 0.8rem);
+  font-size: clamp(0.75rem, 1vw, 0.8rem);
   letter-spacing: 0.1em;
   /* No uppercase: these are the languages' own names for themselves, and
      ESPAÑOL is not one of them. */
@@ -428,6 +435,10 @@ html[lang="ar"] .place-desc { line-height: 1.9; }
 .lang-menu summary {
   list-style: none; /* the disclosure triangle, gone */
   cursor: pointer;
+  /* A finger-sized target around one small word, without moving the word. */
+  display: inline-block;
+  padding: 0.85rem 0.7rem;
+  margin: -0.85rem -0.7rem;
   color: var(--ink-dim);
   transition: color 0.2s ease;
 }
@@ -444,15 +455,17 @@ html[lang="ar"] .place-desc { line-height: 1.9; }
 .lang-menu ul {
   list-style: none;
   position: absolute;
-  top: 0;
+  top: -0.35rem; /* the first link's own padding, so its word still lands on the label */
   inset-inline-end: 0;
   background: var(--paper);
   white-space: nowrap;
 }
 
-.lang-menu li + li { margin-top: 0.55rem; }
-
+/* The spacing between names lives inside each link, so the gap is part of
+ * the target instead of a dead strip between two small ones. */
 .lang-menu a {
+  display: inline-block;
+  padding-block: 0.35rem;
   color: var(--ink-dim);
   border-bottom: none; /* the site underlines links; ten underlines is a fence */
   transition: color 0.2s ease;

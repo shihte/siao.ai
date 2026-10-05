@@ -1,0 +1,8 @@
+# Cloudflare Pages response headers.
+# The fonts never change under the same name (they are OFL subsets built once,
+# committed with their licence), so a year is safe. Everything else keeps the
+# default revalidation, because its name does not change when it does.
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+/og.png
+  Cache-Control: public, max-age=86400
