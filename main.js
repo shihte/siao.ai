@@ -79,6 +79,108 @@ if (menu) {
   });
 }
 
+/* siao.ai landing attribution — the copy every non-Next family site pastes into its beacon.
+ *
+ * Kept in step with apps-siao-ai/lib/woqu/attribution.ts by
+ * lib/woqu/attribution-snippet.test.ts, which runs this file and compares.
+ * Call once per page load, on the first page view:
+ *
+ *   const landing = siaoLanding();          // { a, ft } — spread into the beacon body
+ *   body = { p, r, t, s, l, ...landing };
+ *
+ * It reads ?s= ?f= ?utm_source/medium/campaign, keeps the first visit's source
+ * in localStorage "siao.firstTouch" for 30 days, and takes those parameters
+ * out of the address bar. Never throws. */
+function siaoLanding() {
+  var CODE = /^[23456789ABCDEFGHJKMNPQRSTUVWXYZ]{6}$/;
+  var CHANNELS = ["sheet", "copy", "story"];
+  var DAY30 = 30 * 24 * 60 * 60 * 1000;
+  var NAMES = ["instagram","threads","facebook","line","x","dcard","discord","youtube","tiktok","ptt","reddit","google","bing","yahoo","duckduckgo","chatgpt","perplexity","claude","gemini","share","direct","internal","other"];
+  var UTM = { ig:"instagram", insta:"instagram", instagram:"instagram", threads:"threads", fb:"facebook", facebook:"facebook", line:"line", x:"x", twitter:"x", dcard:"dcard", discord:"discord", yt:"youtube", youtube:"youtube", tiktok:"tiktok", ptt:"ptt", reddit:"reddit", google:"google" };
+  var HOSTS = [
+    [/(^|\.)instagram\.com$/, "instagram"], [/(^|\.)threads\.(net|com)$/, "threads"],
+    [/(^|\.)(facebook\.com|fb\.com|fb\.me)$/, "facebook"], [/(^|\.)line\.me$/, "line"],
+    [/^(t\.co|x\.com|twitter\.com|mobile\.twitter\.com)$/, "x"], [/(^|\.)dcard\.tw$/, "dcard"],
+    [/(^|\.)(discord\.com|discordapp\.com|discord\.gg)$/, "discord"], [/(^|\.)(youtube\.com|youtu\.be)$/, "youtube"],
+    [/(^|\.)tiktok\.com$/, "tiktok"], [/(^|\.)(ptt\.cc)$/, "ptt"], [/(^|\.)reddit\.com$/, "reddit"],
+    [/(^|\.)gemini\.google\.com$/, "gemini"], [/(^|\.)google\.[a-z.]+$/, "google"], [/(^|\.)bing\.com$/, "bing"],
+    [/(^|\.)yahoo\.(com|co\.jp)$|(^|\.)search\.yahoo\./, "yahoo"], [/(^|\.)duckduckgo\.com$/, "duckduckgo"],
+    [/(^|\.)chatgpt\.com$|(^|\.)openai\.com$/, "chatgpt"], [/(^|\.)perplexity\.ai$/, "perplexity"], [/(^|\.)claude\.ai$/, "claude"]
+  ];
+  function token(v) {
+    if (typeof v !== "string") return undefined;
+    v = v.trim().toLowerCase().replace(/\s+/g, "-").slice(0, 40);
+    return /^[a-z0-9][a-z0-9._-]{0,39}$/.test(v) ? v : undefined;
+  }
+  function inApp(ua) {
+    if (/Barcelona/i.test(ua)) return "threads";
+    if (/Instagram/i.test(ua)) return "instagram";
+    if (/FBAN|FBAV|FB_IAB/i.test(ua)) return "facebook";
+    if (/\bLine\//i.test(ua)) return "line";
+    if (/musical_ly|BytedanceWebview|TikTok/i.test(ua)) return "tiktok";
+    if (/Twitter/i.test(ua)) return "x";
+    if (/Dcard/i.test(ua)) return "dcard";
+    if (/Discord/i.test(ua)) return "discord";
+    return null;
+  }
+  function fromReferrer(ref) {
+    if (!ref) return null;
+    try {
+      var host = new URL(ref).hostname.toLowerCase().replace(/^www\./, "");
+      if (host === "siao.ai" || /\.siao\.ai$/.test(host)) return "internal";
+      for (var i = 0; i < HOSTS.length; i++) if (HOSTS[i][0].test(host)) return HOSTS[i][1];
+      return "other";
+    } catch (e) { return null; }
+  }
+  function source(a, ref, ua) {
+    if (a.us && UTM[a.us]) return UTM[a.us];
+    if (a.f === "story") return "instagram";
+    var app = inApp(ua || "");
+    if (app) return app;
+    var r = fromReferrer(ref);
+    if (r && r !== "other") return r;
+    if (a.s || a.f) return "share";
+    if (a.us) return "other";
+    return r || "direct";
+  }
+  siaoLanding.source = source; // for the parity test
+  try {
+    var q = new URLSearchParams(location.search);
+    var a = {};
+    if (CODE.test(q.get("s") || "")) a.s = q.get("s");
+    if (CHANNELS.indexOf(q.get("f")) >= 0) a.f = q.get("f");
+    var us = token(q.get("utm_source")), um = token(q.get("utm_medium")), uc = token(q.get("utm_campaign"));
+    if (us) a.us = us; if (um) a.um = um; if (uc) a.uc = uc;
+    var ref = document.referrer ? new URL(document.referrer).origin : "";
+    var src = source(a, ref, navigator.userAgent);
+    var ft = null, now = Date.now();
+    try {
+      var kept = JSON.parse(localStorage.getItem("siao.firstTouch") || "null");
+      if (kept && typeof kept.at === "number" && now - kept.at <= DAY30 && kept.at <= now && NAMES.indexOf(kept.source) >= 0) ft = kept;
+      else if (src !== "internal") {
+        ft = { source: src, at: now };
+        if (a.s) ft.s = a.s; if (a.f) ft.f = a.f;
+        localStorage.setItem("siao.firstTouch", JSON.stringify(ft));
+      } else localStorage.removeItem("siao.firstTouch");
+    } catch (e) { /* storage refused */ }
+    // Out of the address bar: only our-shaped s/f, and utm.
+    var url = new URL(location.href), changed = false;
+    ["s", "f", "utm_source", "utm_medium", "utm_campaign"].forEach(function (n) {
+      var v = url.searchParams.get(n);
+      if (v === null) return;
+      if (n === "s" && !CODE.test(v)) return;
+      if (n === "f" && CHANNELS.indexOf(v) < 0) return;
+      url.searchParams.delete(n); changed = true;
+    });
+    if (changed) history.replaceState(history.state, "", url.toString());
+    var out = { a: a };
+    if (ft) out.ft = ft;
+    return out;
+  } catch (e) {
+    return {};
+  }
+}
+
 /* ---- One page view to the family's statistics ----
  *
  * The owner asked for one statistics page across every siao.ai site, with
@@ -98,6 +200,9 @@ try {
       t: document.title,
       s: `${screen.width}x${screen.height}`,
       l: navigator.language,
+      // Where this visit came from and who shared the link, if anyone
+      // (siaoLanding, above); also takes those parameters off the address.
+      ...siaoLanding(),
     });
     navigator.sendBeacon("https://woqu.siao.ai/api/hit", new Blob([body], { type: "text/plain" }));
     // Time on the page: only while it is visible, sent when it is hidden
