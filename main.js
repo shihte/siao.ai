@@ -14,6 +14,16 @@
  * before anything else, synchronously, or the restore already happened. */
 history.scrollRestoration = "manual";
 
+/* ---- Arriving by a language switch ----
+ *
+ * The opening (the name uncovered, the line pulled open) is for a visit,
+ * not for every language: arriving through the cross-fade, the page is the
+ * same page in other words, so it shows its finished frame. `pagereveal`
+ * fires before the first frame is drawn, so nothing plays and is cut. */
+addEventListener("pagereveal", (event) => {
+  if (event.viewTransition) document.documentElement.classList.add("arrived");
+});
+
 /* ---- Stay on the card long enough and the page moves on for you ----
  *
  * Any sign of intent from the visitor — scroll, touch, a key — cancels it for
