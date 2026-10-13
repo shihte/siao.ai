@@ -83,7 +83,7 @@ export const LANGUAGES = [
       woqu: "answers to Taiwanese homework and school exams",
       pinhao: "students comparing what they expected of their school with what they found",
       ccvs: "a school rhythm-game club's site",
-      aplus: "learning paths and practice for vocational-school subjects",
+      aplus: "an education platform with video lessons and practice",
     },
   },
   {
@@ -107,7 +107,7 @@ export const LANGUAGES = [
       woqu: "台灣作業與段考的解答庫",
       pinhao: "學生評學校：入學前的期待和實際",
       ccvs: "一個學生音遊社的網站",
-      aplus: "高職科目的學習路徑與練習",
+      aplus: "教育平台：影片教學與練習",
     },
   },
   {
@@ -128,7 +128,7 @@ export const LANGUAGES = [
       woqu: "台湾作业与段考的解答库",
       pinhao: "学生评学校：入学前的期待和实际",
       ccvs: "一个学生音游社的网站",
-      aplus: "高职科目的学习路径与练习",
+      aplus: "教育平台：视频教学与练习",
     },
   },
   {
@@ -149,7 +149,7 @@ export const LANGUAGES = [
       woqu: "台湾の宿題と定期テストの解答集",
       pinhao: "在校生が、入学前の期待と実際を比べる",
       ccvs: "高校の音楽ゲーム部のサイト",
-      aplus: "職業高校の科目の学習パスと練習問題",
+      aplus: "教育プラットフォーム。動画で学び、問題で練習",
     },
   },
   {
@@ -170,7 +170,7 @@ export const LANGUAGES = [
       woqu: "대만 숙제와 시험 문제의 해답 모음",
       pinhao: "재학생이 입학 전 기대와 실제를 비교하는 곳",
       ccvs: "고등학교 리듬게임 동아리의 사이트",
-      aplus: "직업계 고등학교 과목의 학습 경로와 연습 문제",
+      aplus: "교육 플랫폼: 영상 강의와 연습 문제",
     },
   },
   {
@@ -191,7 +191,7 @@ export const LANGUAGES = [
       woqu: "respuestas a tareas y exámenes escolares de Taiwán",
       pinhao: "estudiantes que comparan lo que esperaban de su escuela con lo que encontraron",
       ccvs: "el sitio de un club escolar de videojuegos rítmicos",
-      aplus: "rutas de aprendizaje y práctica para materias de formación profesional",
+      aplus: "una plataforma educativa con videolecciones y práctica",
     },
   },
   {
@@ -212,7 +212,7 @@ export const LANGUAGES = [
       woqu: "les réponses aux devoirs et examens scolaires taïwanais",
       pinhao: "des élèves comparent ce qu'ils attendaient de leur école et ce qu'ils y ont trouvé",
       ccvs: "le site d'un club scolaire de jeux rythmiques",
-      aplus: "parcours d'apprentissage et exercices pour les matières de lycée professionnel",
+      aplus: "une plateforme éducative : leçons vidéo et exercices",
     },
   },
   {
@@ -233,7 +233,7 @@ export const LANGUAGES = [
       woqu: "Lösungen zu taiwanischen Hausaufgaben und Schulprüfungen",
       pinhao: "Schüler vergleichen, was sie von ihrer Schule erwartet haben, mit dem, was sie vorfanden",
       ccvs: "die Seite eines schulischen Rhythmusspiel-Clubs",
-      aplus: "Lernpfade und Übungen für Fächer der Berufsschule",
+      aplus: "eine Bildungsplattform mit Videolektionen und Übungen",
     },
   },
   {
@@ -254,7 +254,7 @@ export const LANGUAGES = [
       woqu: "ответы на тайваньские домашние задания и школьные контрольные",
       pinhao: "ученики сравнивают, чего ждали от школы, с тем, что в ней нашли",
       ccvs: "сайт школьного клуба ритм-игр",
-      aplus: "учебные маршруты и практика по предметам профессионального училища",
+      aplus: "образовательная платформа: видеоуроки и практика",
     },
   },
   {
@@ -275,7 +275,7 @@ export const LANGUAGES = [
       woqu: "إجابات الواجبات والامتحانات المدرسية في تايوان",
       pinhao: "طلاب يقارنون ما توقعوه من مدرستهم بما وجدوه فيها",
       ccvs: "موقع لنادي ألعاب إيقاعية مدرسي",
-      aplus: "مسارات تعلّم وتدريب لمواد المدارس المهنية",
+      aplus: "منصة تعليمية: دروس بالفيديو وتدريب",
     },
   },
 ];
