@@ -8,7 +8,10 @@ import { test, expect } from "@playwright/test";
 test("left alone, the page scrolls to the exits on its own", async ({ page }) => {
   await page.goto("/");
   expect(await page.evaluate(() => window.scrollY)).toBe(0);
-  await expect(page.locator(".email a")).toBeInViewport({ timeout: 6000 });
+  /* The exits' first link, not the email under them: the scroll lands on the
+   * top of the exits, and once the list is long enough the email falls below a
+   * short window's first screen. That is the page working, not failing. */
+  await expect(page.locator(".places li a").first()).toBeInViewport({ timeout: 6000 });
 });
 
 test("touching the page first cancels it for good", async ({ page }) => {
