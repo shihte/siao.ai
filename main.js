@@ -237,3 +237,26 @@ try {
     addEventListener("pagehide", report);
   }
 } catch (e) {}
+
+// Google Analytics 4. Off until a measurement ID (G-XXXXXXXXXX) is put here;
+// with the empty string nothing is loaded and nothing is sent. Cookieless by
+// default (storage consent denied), no advertising signals, attached after
+// load so it never competes with first paint.
+try {
+  const GA_ID = "";
+  if (/^G-[A-Z0-9]{6,14}$/.test(GA_ID)) {
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function () { window.dataLayer.push(arguments); };
+    window.gtag("consent", "default", { ad_storage: "denied", ad_user_data: "denied", ad_personalization: "denied", analytics_storage: "denied" });
+    window.gtag("js", new Date());
+    window.gtag("config", GA_ID, { allow_google_signals: false, allow_ad_personalization_signals: false });
+    const attach = () => {
+      const s = document.createElement("script");
+      s.async = true;
+      s.src = "https://www.googletagmanager.com/gtag/js?id=" + GA_ID;
+      document.head.appendChild(s);
+    };
+    if (document.readyState === "complete") attach();
+    else addEventListener("load", attach);
+  }
+} catch (e) {}
